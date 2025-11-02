@@ -1,0 +1,47 @@
+# public/robots.txt
+
+# 일반 봇 설정
+User-agent: *
+Crawl-delay: 10
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Google (허용)
+User-agent: Googlebot
+Crawl-delay: 5
+Allow: /
+
+# Bing (허용)
+User-agent: Bingbot
+Crawl-delay: 5
+Allow: /
+
+# 공격적인 SEO 봇 차단
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: Amazonbot
+Crawl-delay: 60
+Disallow: /api/
+
+User-agent: SerpstatBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+# Sitemap (있다면)
+Sitemap: https://bumang.xyz/sitemap.xml

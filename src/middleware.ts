@@ -1,15 +1,130 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { END_POINTS } from "./services";
 
 const intlMiddleware = createMiddleware(routing);
 
+// Rate Limiting을 위한 메모리 저장소
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+
+// 차단할 봇 목록
+const blockedBots = [
+  "amazonbot",
+  "ahrefsbot",
+  "semrushbot",
+  "dotbot",
+  "mj12bot",
+  "blexbot",
+  "serpstatbot",
+  "python-requests",
+  "curl/",
+  "wget",
+  "scrapy",
+  "go-http-client",
+  "axios/",
+  "postman",
+];
+
+// 허용할 검증된 봇 (크롤링 속도 제한만 적용)
+const verifiedBots = [
+  "googlebot",
+  "bingbot",
+  "slurp",
+  "duckduckbot",
+  "facebookexternalhit",
+  "twitterbot",
+  "linkedinbot",
+];
+
+// Rate Limiting (사용 한도) 적용 함수
+function applyRateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+): NextResponse | null {
+  const now = Date.now();
+
+  if (!requestCounts.has(key)) {
+    requestCounts.set(key, { count: 1, resetTime: now + windowMs });
+    return null;
+  }
+
+  const record = requestCounts.get(key)!;
+
+  if (now > record.resetTime) {
+    record.count = 1;
+    record.resetTime = now + windowMs;
+    return null;
+  }
+
+  record.count++;
+
+  if (record.count > limit) {
+    console.log(`[RATE_LIMIT] Exceeded: ${key}`);
+    return new NextResponse("Too Many Requests", {
+      status: 429,
+      headers: {
+        "Retry-After": String(Math.ceil((record.resetTime - now) / 1000)),
+      },
+    });
+  }
+
+  // 메모리 정리 (1000개 초과 시)
+  if (requestCounts.size > 1000) {
+    const cutoff = now - windowMs;
+    for (const [k, v] of requestCounts.entries()) {
+      if (v.resetTime < cutoff) {
+        requestCounts.delete(k);
+      }
+    }
+  }
+
+  return null;
+}
+
 export default async function middleware(request: NextRequest) {
+  const ip = request.ip || request.headers.get("x-forwarded-for") || "unknown";
+  const userAgent = request.headers.get("user-agent") || "";
+  const userAgentLower = userAgent.toLowerCase();
+  // 1. 악성 봇 차단
+  const isBlockedBot = blockedBots.some((bot) => userAgentLower.includes(bot));
+
+  if (isBlockedBot) {
+    console.log(`[BLOCKED] Bot: ${userAgent} from ${ip}`);
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+
+  // 2. User Agent가 없거나 너무 짧으면 차단
+  if (!userAgent || userAgent.length < 10) {
+    console.log(`[BLOCKED] Suspicious: Empty/short UA from ${ip}`);
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+
+  // 3. Rate Limiting 적용
+  const isVerifiedBot = verifiedBots.some((bot) =>
+    userAgentLower.includes(bot),
+  );
+
+  let rateLimitResponse: NextResponse | null;
+
+  if (isVerifiedBot) {
+    // 검증된 봇: 1분에 100회
+    rateLimitResponse = applyRateLimit(ip, 100, 60000);
+  } else {
+    // 일반 사용자: 1분에 60회
+    rateLimitResponse = applyRateLimit(ip, 60, 60000);
+  }
+
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
+  // ------------------ 토큰 검증 ------------------
+
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
-
   // 토큰이 있으면 검증하고 필요시 재발급
   if (accessToken || refreshToken) {
     try {
