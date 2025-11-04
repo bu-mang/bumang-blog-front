@@ -100,11 +100,23 @@ const BlogEditorToolBar = ({
 
   /**
    * @그룹_변경_시_카테고리_전환
+   *
+   * selectedCategory가 현재 selectedGroup에 속하지 않을 때만
+   * 첫 번째 카테고리로 변경
    */
   useEffect(() => {
-    const CategoriesInSelectedGroup = selectedGroup?.categories;
-    if (CategoriesInSelectedGroup) {
-      onChangeSelectedCategory(CategoriesInSelectedGroup[0]);
+    if (!selectedGroup?.categories) return;
+
+    const categoryBelongsToGroup = selectedGroup.categories.some(
+      (cat) => cat.id === selectedCategory?.id
+    );
+
+    // 현재 선택된 카테고리가 그룹에 속해있으면 건드리지 않음
+    if (categoryBelongsToGroup) return;
+
+    // 카테고리가 그룹에 속하지 않으면 첫 번째 카테고리로 변경
+    if (selectedGroup.categories.length > 0) {
+      onChangeSelectedCategory(selectedGroup.categories[0]);
     }
     // eslint-disable-next-line
   }, [selectedGroup]);

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   createYooptaEditor,
   YooptaContentValue,
@@ -243,14 +237,19 @@ export default function BlogEditInner({
         const editGroup = groupLists.find(
           (group) => group.id === editDraft.selectedGroup?.id,
         );
-        setSelectedGroup(editGroup ?? null);
 
-        if (editDraft.selectedCategory) {
-          const editCategory = editGroup?.categories.find(
+        let editCategory: CategoryType | null = null;
+
+        if (editDraft.selectedCategory && editGroup) {
+          const foundCategory = editGroup.categories.find(
             (category) => category.id === editDraft.selectedCategory?.id,
           );
-          setSelectedCategory(editCategory ?? null);
+          editCategory = foundCategory ?? null;
         }
+
+        // Group과 Category를 동시에 설정 (중요!)
+        setSelectedCategory(editCategory);
+        setSelectedGroup(editGroup ?? null);
       }
 
       const selected: TagType[] = [];
@@ -333,10 +332,7 @@ export default function BlogEditInner({
           <Divider direction="horizontal" className={"w-full bg-gray-5"} />
 
           {/* EDITOR */}
-          <Editor
-            editor={editor}
-            onChangeEditorValue={onChangeEditorValue}
-          />
+          <Editor editor={editor} onChangeEditorValue={onChangeEditorValue} />
         </div>
       </div>
     </main>
