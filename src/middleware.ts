@@ -62,13 +62,22 @@ function applyRateLimit(
   record.count++;
 
   if (record.count > limit) {
-    console.log(`[RATE_LIMIT] Exceeded: ${key}`);
-    return new NextResponse("Too Many Requests", {
+    console.log(
+      `[RATE_LIMIT] Exceeded: ${key} (${record.count}/${limit} requests)`,
+    );
+    return new NextResponse("Too Many Requests. Please Try Later.", {
       status: 429,
       headers: {
         "Retry-After": String(Math.ceil((record.resetTime - now) / 1000)),
       },
     });
+  }
+
+  // 90% 도달 시 경고 로그
+  if (record.count === Math.floor(limit * 0.9)) {
+    console.log(
+      `[RATE_LIMIT] Warning: ${key} approaching limit (${record.count}/${limit})`,
+    );
   }
 
   // 메모리 정리 (1000개 초과 시)
@@ -85,6 +94,31 @@ function applyRateLimit(
 }
 
 export default async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // 정적 리소스는 Rate Limit 건너뛰기
+  const staticExtensions = [
+    ".js",
+    ".css",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".svg",
+    ".ico",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".eot",
+    ".webp",
+    ".mp4",
+    ".webm",
+  ];
+
+  if (staticExtensions.some((ext) => pathname.endsWith(ext))) {
+    return intlMiddleware(request);
+  }
+
   const ip = request.ip || request.headers.get("x-forwarded-for") || "unknown";
   const userAgent = request.headers.get("user-agent") || "";
   const userAgentLower = userAgent.toLowerCase();
@@ -102,23 +136,25 @@ export default async function middleware(request: NextRequest) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  // 3. Rate Limiting 적용
-  const isVerifiedBot = verifiedBots.some((bot) =>
-    userAgentLower.includes(bot),
-  );
+  // 3. Rate Limiting 적용 (프로덕션 환경만)
+  if (process.env.NODE_ENV === "production") {
+    const isVerifiedBot = verifiedBots.some((bot) =>
+      userAgentLower.includes(bot),
+    );
 
-  let rateLimitResponse: NextResponse | null;
+    let rateLimitResponse: NextResponse | null;
 
-  if (isVerifiedBot) {
-    // 검증된 봇: 1분에 100회
-    rateLimitResponse = applyRateLimit(ip, 100, 60000);
-  } else {
-    // 일반 사용자: 1분에 60회
-    rateLimitResponse = applyRateLimit(ip, 60, 60000);
-  }
+    if (isVerifiedBot) {
+      // 검증된 봇: 1분에 300회
+      rateLimitResponse = applyRateLimit(ip, 300, 60000);
+    } else {
+      // 일반 사용자: 1분에 200회 (한 페이지에 많은 요청이 발생할 수 있음)
+      rateLimitResponse = applyRateLimit(ip, 200, 60000);
+    }
 
-  if (rateLimitResponse) {
-    return rateLimitResponse;
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
   }
 
   // ------------------ 토큰 검증 ------------------
