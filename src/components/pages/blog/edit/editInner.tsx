@@ -2,9 +2,9 @@
 
 import {
   useCallback,
-  useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -158,12 +158,12 @@ export default function BlogEditInner({
    * @EDITOR_LOGIC
    */
   // WITH_BASIC_INIT_VALUE
-  const [editorValue, setEditorValue] = useState<YooptaContentValue>();
   const editor = useMemo(() => createYooptaEditor(), []);
+  const editorValueRef = useRef<YooptaContentValue>();
 
-  const onChangeEditorValue = (value: YooptaContentValue) => {
-    setEditorValue(value);
-  };
+  const onChangeEditorValue = useCallback((value: YooptaContentValue) => {
+    editorValueRef.current = value;
+  }, []);
 
   const getSerializeHTML = useCallback(
     (type: "html" | "plainText" = "html") => {
@@ -274,8 +274,13 @@ export default function BlogEditInner({
     // eslint-disable-next-line
   }, [editId, editDraft, getDeserializeHTML, groupLists, tagLists]);
 
+  const hasContent = useMemo(
+    () => !!title || !!editorValueRef.current,
+    [title],
+  );
+
   const { disablePrevent } = usePageLeavePrevent({
-    enabled: !!title || !!editorValue,
+    enabled: hasContent,
   });
 
   return (
@@ -301,7 +306,6 @@ export default function BlogEditInner({
         handleDraftOpen={handleDraftOpen}
         handleEditValues={handleEditValues}
         // PUBLISH!
-        editorValue={editorValue}
         title={title}
         editor={editor}
         onDisablePrevent={disablePrevent}
@@ -331,7 +335,6 @@ export default function BlogEditInner({
           {/* EDITOR */}
           <Editor
             editor={editor}
-            editorValue={editorValue}
             onChangeEditorValue={onChangeEditorValue}
           />
         </div>

@@ -38,7 +38,7 @@ import { HeadingOne, HeadingThree, HeadingTwo } from "@yoopta/headings";
 import Code from "@yoopta/code";
 import Table from "@yoopta/table";
 import Divider from "@yoopta/divider";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import { postCreatePreSignedUrl, postUploadS3 } from "@/services/api/blog/edit";
 import { getImageDimensions } from "@/utils/getImageDimensions";
 import { useTranslations } from "next-intl";
@@ -211,13 +211,13 @@ const TOOLS = {
 
 interface EditorProps {
   editor: YooEditor;
-  editorValue: YooptaContentValue | undefined;
+  editorValue?: YooptaContentValue | undefined;
 
   onChangeEditorValue: (value: YooptaContentValue) => void;
   readOnly?: boolean;
 }
 
-const Editor = ({
+const Editor = memo(({
   readOnly = false,
   editor,
   editorValue,
@@ -278,6 +278,8 @@ const Editor = ({
       />
     </div>
   );
-};
+});
+
+Editor.displayName = "Editor";
 
 export default Editor;
