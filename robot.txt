@@ -34,8 +34,7 @@ User-agent: BLEXBot
 Disallow: /
 
 User-agent: Amazonbot
-Crawl-delay: 60
-Disallow: /api/
+Disallow: /
 
 User-agent: SerpstatBot
 Disallow: /
