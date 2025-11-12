@@ -63,7 +63,7 @@ const DraftController = ({
   selectedTags,
 
   onSerialize,
-  onDeserialize,
+  // onDeserialize,
 }: DraftControllerProps) => {
   const t = useTranslations("blogEdit.draft");
   const triggerClass = cn(
