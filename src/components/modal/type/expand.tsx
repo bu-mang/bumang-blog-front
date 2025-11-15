@@ -7,7 +7,7 @@ import { TfiClose } from "react-icons/tfi";
 import { ButtonBase } from "@/components/common";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import playItems from "@/app/[locale]/play/playItemsData";
-import usePauseLenis from "@/hooks/usePauseLenis";
+import { usePauseScroll } from "@/hooks/useLenis";
 
 interface ExpandModalProps {
   id: number;
@@ -104,7 +104,7 @@ export default function ExpandModal({
   }, [canNotEscape, currentId]);
 
   // Lenis 임시 끄기 & 다시 활성화
-  usePauseLenis();
+  usePauseScroll();
 
   // 이미지 프리로드 함수
   // const preloadImage = (imgUrl: string): Promise<void> => {

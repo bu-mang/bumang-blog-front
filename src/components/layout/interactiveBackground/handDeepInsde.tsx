@@ -15,7 +15,7 @@ import {
   // cloudRed,
 } from "@/assets/play";
 import { useEffect, useRef, useState } from "react";
-import gsap, { clamp } from "gsap";
+import gsap from "gsap";
 import { randomBetween } from "@/utils/createRandomBetween";
 import { cn } from "@/utils/cn";
 import CustomCursor from "../customCursor";
