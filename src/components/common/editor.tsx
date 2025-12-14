@@ -135,19 +135,6 @@ const plugins = [
       },
     },
   }),
-  // File.extend({
-  //   options: {
-  //     onUpload: async (file) => {
-  //       const preSignedUrl = await postCreatePreSignedUrl(file.name, file.type);
-  //       return {
-  //         src: response.secure_url,
-  //         format: response.format,
-  //         name: response.name,
-  //         size: response.bytes,
-  //       };
-  //     },
-  //   },
-  // }),
   File.extend({
     options: {
       onUpload: async (file) => {
@@ -217,68 +204,70 @@ interface EditorProps {
   readOnly?: boolean;
 }
 
-const Editor = memo(({
-  readOnly = false,
-  editor,
-  editorValue,
-  onChangeEditorValue,
-}: EditorProps) => {
-  // i18n
-  const t = useTranslations("blogEdit");
+const Editor = memo(
+  ({
+    readOnly = false,
+    editor,
+    editorValue,
+    onChangeEditorValue,
+  }: EditorProps) => {
+    // i18n
+    const t = useTranslations("blogEdit");
 
-  const selectionRef = useRef<HTMLDivElement>(null);
+    const selectionRef = useRef<HTMLDivElement>(null);
 
-  // 블록 추가
-  const addBlockData = (index: number, focus = true) => {
-    if (readOnly) return;
+    // 블록 추가
+    const addBlockData = (index: number, focus = true) => {
+      if (readOnly) return;
 
-    const blockData = Blocks.buildBlockData();
-    const insertBlockOptions = {
-      blockData,
-      at: index,
-      focus,
+      const blockData = Blocks.buildBlockData();
+      const insertBlockOptions = {
+        blockData,
+        at: index,
+        focus,
+      };
+      const insertedId = editor.insertBlock("Paragraph", insertBlockOptions);
+
+      return insertedId;
     };
-    const insertedId = editor.insertBlock("Paragraph", insertBlockOptions);
 
-    return insertedId;
-  };
-
-  const handleEditorFocus = () => {
-    if (selectionRef.current) {
-      if (editor.isEmpty()) {
-        addBlockData(0, true);
-      } else {
-        const length = Object.keys(editor.getEditorValue()).length;
-        if (length <= 20) {
-          addBlockData(length, false);
+    const handleEditorFocus = () => {
+      if (selectionRef.current) {
+        if (editor.isEmpty()) {
+          addBlockData(0, true);
+        } else {
+          const length = Object.keys(editor.getEditorValue()).length;
+          if (length <= 20) {
+            addBlockData(length, false);
+          }
         }
       }
-    }
-  };
+    };
 
-  return (
-    <div
-      className="flex flex-1 flex-col"
-      ref={selectionRef}
-      onClick={handleEditorFocus}
-    >
-      <YooptaEditor
-        width="100%"
-        className="flex-1 p-2"
-        editor={editor}
-        plugins={plugins}
-        placeholder={t("contentPlaceHolder")}
-        value={editorValue}
-        onChange={onChangeEditorValue}
-        selectionBoxRoot={selectionRef}
-        tools={TOOLS}
-        marks={MARKS}
-        autoFocus
-        readOnly={readOnly}
-      />
-    </div>
-  );
-});
+    return (
+      <div
+        className="flex flex-1 flex-col"
+        ref={selectionRef}
+        onClick={handleEditorFocus}
+      >
+        <YooptaEditor
+          width="100%"
+          className="flex-1 p-2"
+          editor={editor}
+          plugins={plugins}
+          placeholder={t("contentPlaceHolder")}
+          value={editorValue}
+          onChange={onChangeEditorValue}
+          selectionBoxRoot={selectionRef}
+          tools={TOOLS}
+          marks={MARKS}
+          autoFocus
+          readOnly={readOnly}
+        />
+      </div>
+    );
+  },
+);
 
 Editor.displayName = "Editor";
 

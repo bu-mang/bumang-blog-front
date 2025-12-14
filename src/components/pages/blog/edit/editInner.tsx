@@ -166,14 +166,12 @@ export default function BlogEditInner({
 
       if (type === "html") {
         const htmlString = html.serialize(editor, data);
-        console.log(htmlString);
 
         return htmlString;
       }
 
       if (type === "plainText") {
         const plainString = plainText.serialize(editor, data);
-        console.log(plainString);
 
         return plainString;
       }
