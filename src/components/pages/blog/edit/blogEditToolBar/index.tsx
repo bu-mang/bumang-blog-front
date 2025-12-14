@@ -15,11 +15,12 @@ import {
 import { useRouter } from "@/i18n/navigation";
 import { TagType, GroupType, CategoryType } from "@/types";
 import DraftController from "../draftController";
-import { YooEditor, YooptaContentValue } from "@yoopta/editor";
+import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { PublishDrawer } from "@/components/pages/blog/edit/blogEditToolBar/publishDrawer";
 import { useTranslations } from "next-intl";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
 import { useTheme } from "next-themes";
+import { SaveStatus } from "@/hooks/useAutoSave";
 
 interface BlogEditorToolBarProps {
   // List
@@ -45,19 +46,23 @@ interface BlogEditorToolBarProps {
   handleDraftOpen: () => void;
   handleEditValues: (
     title: string,
-    content: string | undefined,
+    content: PartialBlock[] | undefined,
     group: GroupType | null,
     category: CategoryType | null,
     tags: TagType[],
   ) => void;
 
-  editorValue?: YooptaContentValue;
+  editorValue?: PartialBlock[];
   title: string;
 
-  editor: YooEditor;
-  onSerialize: (type?: "html" | "plainText") => string | undefined;
-  onDeserialize: (text: string) => void;
+  editor: BlockNoteEditor | null;
+  onSerialize: () => PartialBlock[] | undefined;
+  onDeserialize: (content: PartialBlock[]) => void;
   onDisablePrevent: () => void;
+
+  // Auto-save status
+  saveStatus?: SaveStatus;
+  lastSavedAt?: Date | null;
 }
 
 const BlogEditorToolBar = ({

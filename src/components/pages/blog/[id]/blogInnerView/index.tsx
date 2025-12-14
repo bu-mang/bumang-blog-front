@@ -3,14 +3,15 @@
 import {
   ButtonBase,
   Divider,
-  Editor,
   FillButton,
   Tag,
   TagWrapper,
 } from "@/components/common";
 import { PostDetailResponseDto } from "@/types/dto/blog/[id]";
-import { createYooptaEditor, YooptaContentValue } from "@yoopta/editor";
-import { html } from "@yoopta/exports";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/mantine/style.css";
+import { PartialBlock } from "@blocknote/core";
 import { format } from "date-fns";
 import {
   AlignJustifyIcon,
@@ -20,7 +21,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import BlogIndex from "../../(list)/blogIndex";
 import BlogComment from "./blogComment";
 import RelatedAndAdjacentPost from "./relatedPosts";
@@ -35,6 +36,11 @@ import { useMutation } from "@tanstack/react-query";
 import { deletePost } from "@/services/api/blog/edit";
 import { useTranslations } from "next-intl";
 import { useHeaderStore } from "@/store/header";
+import {
+  detectContentFormat,
+  parseBlockNoteContent,
+  parseYooptaContent,
+} from "@/utils/contentFormat";
 
 interface BlogDetailInnerProps {
   post: PostDetailResponseDto;
@@ -151,24 +157,44 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
   /**
    * EDITOR_LOGIC
    */
-  const editor = useMemo(() => createYooptaEditor(), []);
-  const [editorValue] = useState<YooptaContentValue>();
   const [indexParsed, setIndexParsed] = useState(false);
   const user = useAuthStore((state) => state.user);
   const setAllEditState = useEditStore((state) => state.setAllEditState);
 
-  // parsing해서 HTML로.
-  const getDeserializeHTML = (text: string) => {
-    const content = html.deserialize(editor, text);
+  // Detect content format
+  const contentFormat = useMemo(() => {
+    return detectContentFormat(post.content);
+  }, [post.content]);
 
-    editor.setEditorValue(content);
-    setIndexParsed(true);
-  };
+  // Parse BlockNote content
+  const blockNoteContent = useMemo(() => {
+    if (contentFormat !== "blocknote") return undefined;
+    return parseBlockNoteContent(post.content);
+  }, [contentFormat, post.content]);
 
+  // Parse Yoopta HTML content
+  const yooptaHTML = useMemo(() => {
+    if (contentFormat !== "yoopta") return "";
+    return parseYooptaContent(post.content);
+  }, [contentFormat, post.content]);
+
+  // Only create BlockNote editor if format is blocknote
+  const editor = useCreateBlockNote(
+    blockNoteContent
+      ? {
+          initialContent: blockNoteContent,
+        }
+      : undefined,
+  );
+
+  // 파싱 완료 표시
   useEffect(() => {
-    getDeserializeHTML(post.content ?? "내용 없음");
-    // eslint-disable-next-line
-  }, []);
+    if (contentFormat === "blocknote" && blockNoteContent && blockNoteContent.length > 0) {
+      setIndexParsed(true);
+    } else if (contentFormat === "yoopta" && yooptaHTML) {
+      setIndexParsed(true);
+    }
+  }, [contentFormat, blockNoteContent, yooptaHTML]);
 
   const handleSetDraft = () => {
     setAllEditState(
@@ -294,12 +320,22 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
           )}
         </div>
 
-        <Editor
-          editor={editor}
-          editorValue={editorValue}
-          onChangeEditorValue={() => {}}
-          readOnly
-        />
+        {contentFormat === "blocknote" && (
+          <BlockNoteView editor={editor} theme="light" editable={false} />
+        )}
+
+        {contentFormat === "yoopta" && (
+          <div
+            className="yoopta-content prose prose-lg max-w-none dark:prose-invert"
+            dangerouslySetInnerHTML={{ __html: yooptaHTML }}
+          />
+        )}
+
+        {contentFormat === "unknown" && (
+          <div className="py-8 text-center text-gray-400">
+            Unable to render content (unknown format)
+          </div>
+        )}
       </div>
 
       {/* 목차 */}

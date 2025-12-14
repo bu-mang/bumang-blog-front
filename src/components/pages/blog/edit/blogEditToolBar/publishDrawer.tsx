@@ -17,7 +17,7 @@ import { Tag } from "../../../../common/tag";
 import { ButtonBase } from "../../../../common/button";
 import { CategoryType, GroupType, RoleType, TagType } from "@/types";
 import { cn } from "@/utils/cn";
-import { SlateElement, YooEditor, YooptaContentValue } from "@yoopta/editor";
+import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
@@ -34,12 +34,12 @@ import { useTranslations } from "next-intl";
 
 interface DrawerSheetProps {
   title: string;
-  editorValue?: YooptaContentValue;
+  editorValue?: PartialBlock[];
   selectedGroup: GroupType | null;
   selectedCategory: CategoryType | null;
   selectedTags: TagType[];
-  editor: YooEditor;
-  onSerialize: (type?: "html" | "plainText") => string | undefined;
+  editor: BlockNoteEditor | null;
+  onSerialize: () => PartialBlock[] | undefined;
   onDisablePrevent: () => void;
 }
 
@@ -124,7 +124,9 @@ export function PublishDrawer({
 
   // PUBLISH!!
   const handlePublish = async () => {
-    const serializedHTML = onSerialize("html");
+    // BlockNote content를 HTML로 변환
+    const content = onSerialize();
+    const serializedHTML = content ? JSON.stringify(content) : undefined;
     const categoryId = selectedCategory?.id;
     const tagIds = selectedTags.map((item) => item.id);
     const thumbnailUrl = thumbnails[thumbnailIndex];
@@ -181,39 +183,50 @@ export function PublishDrawer({
     });
   };
 
-  // string 직렬화해서 서버 패칭
-
+  // BlockNote에서 이미지와 텍스트 추출
   const getImages = useCallback((): string[] => {
-    const data = editor.getEditorValue();
-    const imageBlocks = Object.values(data).filter(
-      (item) => item.type === "Image",
-    );
+    if (!editor) return [];
 
     const imageUrls: string[] = [];
+    const blocks = editor.document;
 
-    imageBlocks.forEach((block) => {
-      if (!block?.value || !Array.isArray(block.value)) return;
-
-      block.value.forEach((element) => {
-        // 타입 가드 추가
-        if (element && typeof element === "object" && "props" in element) {
-          const slateElement = element as SlateElement;
-          const src = slateElement.props?.src;
-
-          if (typeof src === "string" && src.trim()) {
-            imageUrls.push(src);
-          }
-        }
-      });
+    blocks.forEach((block) => {
+      if (block.type === "image" && block.props?.url) {
+        imageUrls.push(block.props.url as string);
+      }
     });
 
     return imageUrls;
   }, [editor]);
 
+  const getPreviewText = useCallback((): string => {
+    if (!editor) return "";
+
+    let text = "";
+    const blocks = editor.document;
+
+    blocks.forEach((block) => {
+      if (block.type === "paragraph" || block.type === "heading") {
+        const content = block.content;
+        if (Array.isArray(content)) {
+          content.forEach((item) => {
+            if (item.type === "text" && item.text) {
+              text += item.text + " ";
+            }
+          });
+        }
+      }
+    });
+
+    return text.trim();
+  }, [editor]);
+
   useEffect(() => {
-    setThumbnails(getImages());
-    setPreviewText((onSerialize("plainText") ?? "").slice(0, 200));
-  }, [open, onSerialize, getImages]);
+    if (open) {
+      setThumbnails(getImages());
+      setPreviewText(getPreviewText().slice(0, 200));
+    }
+  }, [open, getImages, getPreviewText]);
 
   return (
     <Drawer

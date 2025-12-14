@@ -18,7 +18,7 @@ import { useAuthStore } from "@/store/auth";
 import useModalStore from "@/store/modal";
 import { CategoryType, GroupType, TagType, DraftType } from "@/types";
 import { cn } from "@/utils/cn";
-import { YooptaContentValue } from "@yoopta/editor";
+import { PartialBlock } from "@blocknote/core";
 import { format } from "date-fns";
 import { Plus, Save } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -30,7 +30,7 @@ interface DraftControllerProps {
   handleDraftOpen: (v?: boolean) => void;
   handleEditValues: (
     title: string,
-    content: string | undefined,
+    content: PartialBlock[] | undefined,
     group: GroupType | null,
     category: CategoryType | null,
     tags: TagType[],
@@ -39,13 +39,13 @@ interface DraftControllerProps {
   className?: string;
 
   title: string;
-  content: YooptaContentValue | undefined;
+  content: PartialBlock[] | undefined;
   selectedGroup: GroupType | null;
   selectedCategory: CategoryType | null;
   selectedTags: TagType[];
 
-  onSerialize: (type?: "html" | "plainText") => string | undefined;
-  onDeserialize: (text: string) => void;
+  onSerialize: () => PartialBlock[] | undefined;
+  onDeserialize: (content: PartialBlock[]) => void;
 }
 
 const DraftController = ({
@@ -151,7 +151,7 @@ const DraftController = ({
   const saveDraft = useCallback(
     (draftToSave: DraftType) => {
       setStatus(t("status.saving"));
-      draftToSave.content = onSerialize("html");
+      draftToSave.content = onSerialize();
 
       setDrafts((prevDrafts) => {
         const existingIndex = prevDrafts.findIndex(
@@ -212,7 +212,7 @@ const DraftController = ({
     setCurrentDraftId(draftId);
 
     let draftContent = undefined;
-    if (typeof draft.content === "string") {
+    if (Array.isArray(draft.content)) {
       draftContent = draft.content;
     }
 

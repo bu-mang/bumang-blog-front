@@ -1,26 +1,28 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import {
-  createYooptaEditor,
-  YooptaContentValue,
-  // YooptaOnChangeOptions,
-} from "@yoopta/editor";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { PartialBlock } from "@blocknote/core";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/mantine/style.css";
 
-import { Divider, Editor } from "@/components/common";
+import { Divider } from "@/components/common";
 import { BlogEditorToolBar } from "@/components/pages";
+import { EditorErrorBoundary } from "@/components/error/EditorErrorBoundary";
+import { postCreatePreSignedUrl, postUploadS3 } from "@/services/api/blog/edit";
 
 import { CategoryType, GroupType, TagType } from "@/types";
 import { cn } from "@/utils/cn";
 
 import { LAYOUT_PADDING_ALONGSIDE } from "@/constants/layouts/layout";
 import { sortStringOrder } from "@/utils/sortTagOrder";
-import { html, plainText } from "@yoopta/exports";
 import { useEditStore } from "@/store/edit";
 import useModalStore from "@/store/modal";
 import CommonModal from "@/components/modal/type/common";
 import { useLocale, useTranslations } from "next-intl";
 import { usePageLeavePrevent } from "@/hooks/usePageLeavePrevent";
+import { useAutoSave } from "@/hooks/useAutoSave";
+import { DraftData } from "@/lib/indexedDB";
 
 interface BlogEditInnerProps {
   tagLists: TagType[];
@@ -33,28 +35,25 @@ export default function BlogEditInner({
 }: BlogEditInnerProps) {
   // i18n
   const t = useTranslations("blogEdit");
+  const locale = useLocale();
 
-  // ------------- 중앙부 그룹/카테고리/태그 로직 (중앙) -------------
+  // ------------- 중앙부 그룹/카테고리/태그 로직 -------------
 
-  // 그룹
   const [selectedGroup, setSelectedGroup] = useState<GroupType | null>(null);
-  // 카테고리
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(
     null,
   );
-  // 태그
   const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
   const [unselectedTags, setUnselectedTags] = useState<TagType[]>(tagLists);
 
-  // 그룹 변경
   const handleChangeSelectedGroup = (v: GroupType) => {
     setSelectedGroup(v);
   };
-  // 카테고리 변경
+
   const handleChangeSelectedCategory = (v: CategoryType) => {
     setSelectedCategory(v);
   };
-  // 태그 변경
+
   const handleSwitchTags = ({
     targetId,
     from,
@@ -62,7 +61,6 @@ export default function BlogEditInner({
     targetId: number;
     from: "selectedTags" | "unselectedTags";
   }) => {
-    // 선택된 배열에서 선택 안 된 배열로 보내기
     if (from === "selectedTags") {
       const foundIndex = selectedTags.findIndex((item) => item.id === targetId);
       if (foundIndex === -1) return;
@@ -77,8 +75,6 @@ export default function BlogEditInner({
 
       setSelectedTags(newSelectedTags);
       setUnselectedTags(newUnselectedTags);
-
-      // 선택되지 않은 배얄에서 선택된 배열로 보내기
     } else if (from === "unselectedTags") {
       const foundIndex = unselectedTags.findIndex(
         (item) => item.id === targetId,
@@ -95,25 +91,88 @@ export default function BlogEditInner({
     }
   };
 
-  // ------------- 임시저장 DRAFT 로직 (우측) -------------
+  // ------------- 본문 로직 -------------
 
-  /**
-   * @DRAFT
-   */
+  const [title, setTitle] = useState("");
+  const [draftId] = useState(() => Date.now());
+
+  const handleChangeTitle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTitle(e.target.value);
+    const target = e.target as HTMLTextAreaElement;
+    target.style.height = "auto";
+    target.style.height = `${target.scrollHeight}px`;
+  };
+
+  // BlockNote 에디터 초기화
+  const editor = useCreateBlockNote({
+    uploadFile: async (file: File) => {
+      try {
+        if (file.size > 10 * 1024 * 1024) {
+          throw new Error("파일 크기는 10MB 이하여야 합니다.");
+        }
+
+        const preSignedUrl = await postCreatePreSignedUrl(file.name, file.type);
+        const { url, publicUrl } = preSignedUrl;
+
+        await postUploadS3(url, file);
+
+        return publicUrl;
+      } catch (error) {
+        console.error("File upload failed:", error);
+        throw error;
+      }
+    },
+  });
+
+  // ------------- 자동저장 로직 (새로 추가) -------------
+
+  const getDraftData = useCallback((): DraftData => {
+    const content = editor?.document || [];
+
+    return {
+      id: draftId,
+      title,
+      content,
+      selectedGroup,
+      selectedCategory,
+      selectedTags,
+      lastUpdatedAt: new Date().toISOString(),
+    };
+  }, [draftId, title, selectedGroup, selectedCategory, selectedTags]);
+
+  const { saveStatus, lastSavedAt, emergencySave } = useAutoSave({
+    enabled: true,
+    getData: getDraftData,
+    debounceMs: 2000,
+    maxWaitMs: 30000,
+    onSaveSuccess: () => {
+      console.log("Auto-save successful");
+    },
+    onSaveError: (error) => {
+      console.error("Auto-save failed:", error);
+    },
+  });
+
+  // ------------- 임시저장 DRAFT 로직 -------------
+
   const [isDraftOpen, setIsDraftOpen] = useState(false);
   const handleDraftOpen = () => setIsDraftOpen((prev) => !prev);
+
   const handleEditValues = (
     title: string,
-    value: string | undefined,
+    value: PartialBlock[] | undefined,
     group: GroupType | null,
     category: CategoryType | null,
     tags: TagType[],
   ) => {
     setTitle(title);
-    if (value) {
-      getDeserializeHTML(value);
-    } else {
-      editor.setEditorValue(null);
+
+    // BlockNote content 복원
+    if (value && editor) {
+      editor.replaceBlocks(
+        editor.document,
+        value,
+      );
     }
 
     setSelectedGroup(group);
@@ -134,74 +193,17 @@ export default function BlogEditInner({
     setUnselectedTags(unselected);
   };
 
-  // ------------- 본문 로직 -------------
+  // ------------- 수정 페이지 Draft 로드 -------------
 
-  /**
-   * @TITLE_LOGIC
-   */
-  const [title, setTitle] = useState("");
-
-  const handleChangeTitle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTitle(e.target.value);
-    const target = e.target as HTMLTextAreaElement;
-    target.style.height = "auto"; // 높이를 초기화한 후
-    target.style.height = `${target.scrollHeight}px`;
-  };
-
-  /**
-   * @EDITOR_LOGIC
-   */
-  // WITH_BASIC_INIT_VALUE
-  const editor = useMemo(() => createYooptaEditor(), []);
-  const editorValueRef = useRef<YooptaContentValue>();
-
-  const onChangeEditorValue = useCallback((value: YooptaContentValue) => {
-    editorValueRef.current = value;
-  }, []);
-
-  const getSerializeHTML = useCallback(
-    (type: "html" | "plainText" = "html") => {
-      const data = editor.getEditorValue();
-      if (!data) return;
-
-      if (type === "html") {
-        const htmlString = html.serialize(editor, data);
-
-        return htmlString;
-      }
-
-      if (type === "plainText") {
-        const plainString = plainText.serialize(editor, data);
-
-        return plainString;
-      }
-
-      return;
-    },
-    [editor],
-  );
-
-  const getDeserializeHTML = useCallback(
-    (text: string) => {
-      const content = html.deserialize(editor, text);
-
-      editor.setEditorValue(content);
-
-      return content;
-    },
-    [editor],
-  );
-
-  // 수정 페이지 edit?id=...
-  const locale = useLocale();
   const openModal = useModalStore((state) => state.openModal);
   const editId = useEditStore((state) => state.id);
   const editDraft = useEditStore((state) => state.editDraft);
   const entryPoint = useEditStore((state) => state.entryPoint);
   const setAllEditState = useEditStore((state) => state.setAllEditState);
+
   useLayoutEffect(() => {
-    console.log(editDraft, editId, entryPoint, "!!!");
     if (!editDraft) return;
+
     const title =
       locale === "ko" ? "작성하던 글이 존재해요." : "A Draft Exists";
     const desc =
@@ -215,8 +217,6 @@ export default function BlogEditInner({
           proceedFn: () => true,
         });
 
-        console.log(res, "what res");
-
         if (!res) {
           setAllEditState(editId, null, "new");
           return;
@@ -227,8 +227,12 @@ export default function BlogEditInner({
         setTitle(editDraft.title);
       }
 
-      if (editDraft.content) {
-        getDeserializeHTML(editDraft.content as string);
+      if (editDraft.content && editor && Array.isArray(editDraft.content)) {
+        // BlockNote content 복원
+        editor.replaceBlocks(
+          editor.document,
+          editDraft.content,
+        );
       }
 
       if (editDraft.selectedGroup) {
@@ -245,7 +249,6 @@ export default function BlogEditInner({
           editCategory = foundCategory ?? null;
         }
 
-        // Group과 Category를 동시에 설정 (중요!)
         setSelectedCategory(editCategory);
         setSelectedGroup(editGroup ?? null);
       }
@@ -269,70 +272,94 @@ export default function BlogEditInner({
 
     handleLoadDraft();
     // eslint-disable-next-line
-  }, [editId, editDraft, getDeserializeHTML, groupLists, tagLists]);
+  }, [editId, editDraft, groupLists, tagLists]);
 
-  const hasContent = useMemo(
-    () => !!title || !!editorValueRef.current,
-    [title],
-  );
+  // ------------- 페이지 이탈 방지 -------------
+
+  const hasContent = useMemo(() => !!title || !!editor?.document, [
+    title,
+    editor,
+  ]);
 
   const { disablePrevent } = usePageLeavePrevent({
     enabled: hasContent,
   });
 
+  // ------------- 직렬화/역직렬화 (BlockNote용) -------------
+
+  const getSerializeContent = useCallback(() => {
+    if (!editor) return undefined;
+    // BlockNote document를 그대로 반환
+    return editor.document;
+  }, [editor]);
+
+  const getDeserializeContent = useCallback((content: PartialBlock[]) => {
+    if (!editor) return;
+    editor.replaceBlocks(editor.document, content);
+  }, [editor]);
+
   return (
-    <main className="flex min-h-screen w-full flex-col">
-      {/* 상단 헤더 (ToolBar) */}
-      <BlogEditorToolBar
-        // Content
-        onSerialize={getSerializeHTML}
-        onDeserialize={getDeserializeHTML}
-        // Group
-        selectedGroup={selectedGroup}
-        onChangeSelectedGroup={handleChangeSelectedGroup}
-        groupLists={groupLists}
-        // Category
-        selectedCategory={selectedCategory}
-        onChangeSelectedCategory={handleChangeSelectedCategory}
-        // Tags
-        selectedTags={selectedTags}
-        unselectedTags={unselectedTags}
-        handleSwitchTags={handleSwitchTags}
-        // Draft
-        isDraftOpen={isDraftOpen}
-        handleDraftOpen={handleDraftOpen}
-        handleEditValues={handleEditValues}
-        // PUBLISH!
-        title={title}
-        editor={editor}
-        onDisablePrevent={disablePrevent}
-      />
+    <EditorErrorBoundary emergencySave={emergencySave}>
+      <main className="flex min-h-screen w-full flex-col">
+        {/* 상단 헤더 (ToolBar) */}
+        <BlogEditorToolBar
+          // Content
+          onSerialize={getSerializeContent}
+          onDeserialize={getDeserializeContent}
+          // Group
+          selectedGroup={selectedGroup}
+          onChangeSelectedGroup={handleChangeSelectedGroup}
+          groupLists={groupLists}
+          // Category
+          selectedCategory={selectedCategory}
+          onChangeSelectedCategory={handleChangeSelectedCategory}
+          // Tags
+          selectedTags={selectedTags}
+          unselectedTags={unselectedTags}
+          handleSwitchTags={handleSwitchTags}
+          // Draft
+          isDraftOpen={isDraftOpen}
+          handleDraftOpen={handleDraftOpen}
+          handleEditValues={handleEditValues}
+          // PUBLISH!
+          title={title}
+          editor={editor}
+          onDisablePrevent={disablePrevent}
+          // Auto-save status (새로 추가)
+          saveStatus={saveStatus}
+          lastSavedAt={lastSavedAt}
+        />
 
-      {/* 본문 영역 */}
-      <div
-        className={cn(
-          "flex w-full flex-1 justify-center pt-24",
-          LAYOUT_PADDING_ALONGSIDE,
-        )}
-      >
-        <div className="flex w-[720px] flex-col">
-          {/* INPUT */}
-          <textarea
-            className="flex h-auto min-h-20 w-full resize-none flex-wrap overflow-hidden rounded-md border-none bg-transparent px-2 py-4 text-5xl font-semibold leading-normal outline-none transition-colors placeholder:text-gray-100 hover:bg-gray-1 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
-            placeholder={t("titlePlaceHolder")}
-            tabIndex={1}
-            value={title}
-            maxLength={48}
-            onChange={handleChangeTitle}
-          />
+        {/* 본문 영역 */}
+        <div
+          className={cn(
+            "flex w-full flex-1 justify-center pt-24",
+            LAYOUT_PADDING_ALONGSIDE,
+          )}
+        >
+          <div className="flex w-[720px] flex-col">
+            {/* INPUT */}
+            <textarea
+              className="flex h-auto min-h-20 w-full resize-none flex-wrap overflow-hidden rounded-md border-none bg-transparent px-2 py-4 text-5xl font-semibold leading-normal outline-none transition-colors placeholder:text-gray-100 hover:bg-gray-1 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+              placeholder={t("titlePlaceHolder")}
+              tabIndex={1}
+              value={title}
+              maxLength={48}
+              onChange={handleChangeTitle}
+            />
 
-          {/* DIVIDER */}
-          <Divider direction="horizontal" className={"w-full bg-gray-5"} />
+            {/* DIVIDER */}
+            <Divider direction="horizontal" className={"w-full bg-gray-5"} />
 
-          {/* EDITOR */}
-          <Editor editor={editor} onChangeEditorValue={onChangeEditorValue} />
+            {/* BLOCKNOTE EDITOR */}
+            <BlockNoteView
+              editor={editor}
+              theme="light"
+              editable={true}
+            />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </EditorErrorBoundary>
   );
 }
