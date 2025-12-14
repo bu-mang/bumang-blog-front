@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PartialBlock } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -201,7 +201,7 @@ export default function BlogEditInner({
   const entryPoint = useEditStore((state) => state.entryPoint);
   const setAllEditState = useEditStore((state) => state.setAllEditState);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!editDraft) return;
 
     const title =
