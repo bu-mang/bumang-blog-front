@@ -64,8 +64,9 @@ export function PublishDrawer() {
   const postMutation = useMutation({
     mutationFn: postCreatePost,
     onSuccess: () => {
-      router.replace(PATHNAME.BLOG);
-      setTimeout(() => router.refresh(), 500);
+      setTimeout(() => {
+        router.replace(PATHNAME.BLOG);
+      }, 500);
     },
     onError: (error) => {
       if (!isAxiosError(error)) return;
@@ -95,8 +96,9 @@ export function PublishDrawer() {
     mutationFn: ({ queryId, ...rest }: CreatePostDto & { queryId: string }) =>
       patchUpdatePost(queryId, rest),
     onSuccess: () => {
-      router.replace(PATHNAME.BLOG + `/${queryId}`);
-      router.refresh();
+      setTimeout(() => {
+        router.replace(PATHNAME.BLOG + `/${queryId}`);
+      }, 500);
     },
     onError: (error) => {
       if (!isAxiosError(error)) return;

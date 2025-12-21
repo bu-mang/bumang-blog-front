@@ -249,7 +249,6 @@ export function BlogItemFallback({ itemViewType }: BlogItemFallbackProps) {
 
           {/* TITLE */}
           <div className="mb-1 mt-2.5 flex items-center gap-1 group-hover:text-gray-500">
-            {/* <div className={titleStyle}>{title}</div> */}
             <Skeleton className="h-6 w-full" />
 
             <Skeleton className="h-6 w-6" />

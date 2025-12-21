@@ -1,7 +1,6 @@
 import { SectionBox, SubBox } from "./about/aboutSection";
 
 import BlogEditorToolBar from "./blog/edit/blogEditToolBar";
-import BlogPublishingView from "./blog/edit/blogPublishingView";
 import BlogItem from "./blog/(list)/blogItem";
 import BlogIndex from "./blog/(list)/blogIndex";
 import DraftController from "./blog/edit/draftController";
@@ -25,7 +24,6 @@ export {
   SectionBox,
   SubBox,
   // Blog
-  BlogPublishingView,
   BlogEditorToolBar,
   BlogItem,
   BlogIndex,
