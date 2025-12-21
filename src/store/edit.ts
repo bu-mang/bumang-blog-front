@@ -1,14 +1,13 @@
 // lib/store/useAuthStore.ts
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { DraftType } from "@/types/draft";
+import { PartialBlock } from "@blocknote/core";
 import { YooptaContentValue } from "@yoopta/editor";
-import { GroupType, TagType } from "@/types";
 import { persist } from "zustand/middleware";
 
 interface EditDraftType {
   title: string;
-  content: YooptaContentValue | string | undefined;
+  content: YooptaContentValue | string | PartialBlock[] | undefined;
   selectedGroup: { id: number; label: string } | null;
   selectedCategory: { id: number; label: string } | null;
   selectedTags: { id: number; label: string }[];

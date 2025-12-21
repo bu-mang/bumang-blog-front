@@ -197,11 +197,13 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
   }, [contentFormat, blockNoteContent, yooptaHTML]);
 
   const handleSetDraft = () => {
+    const draftContent = contentFormat === "blocknote" ? blockNoteContent : undefined;
+
     setAllEditState(
       post.id,
       {
         title: post.title,
-        content: post.content,
+        content: draftContent,
         selectedGroup: post.group,
         selectedCategory: post.category,
         selectedTags: post.tags,
