@@ -44,7 +44,7 @@ export function PublishDrawer() {
     onDisablePrevent,
   } = useBlogEditorContext();
 
-  const editorValue = onSerialize();
+  // const editorValue = onSerialize();
   const t = useTranslations("blogEdit.publish");
   const { fillStyle: DarkFillStyle, textStyle: DarkTextStyle } =
     getButtonColorStyle("dark");
@@ -153,7 +153,7 @@ export function PublishDrawer() {
 
     // 수정인 경우
     if (queryId) {
-      updateMutation.mutateAsync({
+      updateMutation.mutate({
         queryId,
         title,
         content: serializedHTML,
@@ -166,7 +166,7 @@ export function PublishDrawer() {
       return;
     }
 
-    postMutation.mutateAsync({
+    postMutation.mutate({
       title,
       content: serializedHTML,
       previewText,

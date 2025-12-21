@@ -189,7 +189,11 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
 
   // 파싱 완료 표시
   useEffect(() => {
-    if (contentFormat === "blocknote" && blockNoteContent && blockNoteContent.length > 0) {
+    if (
+      contentFormat === "blocknote" &&
+      blockNoteContent &&
+      blockNoteContent.length > 0
+    ) {
       setIndexParsed(true);
     } else if (contentFormat === "yoopta" && yooptaHTML) {
       setIndexParsed(true);
@@ -197,7 +201,8 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
   }, [contentFormat, blockNoteContent, yooptaHTML]);
 
   const handleSetDraft = () => {
-    const draftContent = contentFormat === "blocknote" ? blockNoteContent : undefined;
+    const draftContent =
+      contentFormat === "blocknote" ? blockNoteContent : undefined;
 
     setAllEditState(
       post.id,
@@ -224,9 +229,6 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
     mutationFn: () => deletePost(queryId),
     onSuccess: () => {
       router.back();
-      setTimeout(() => {
-        router.refresh();
-      }, 300);
     },
   });
 
