@@ -241,9 +241,10 @@ export default function BlogEditInner({
       let editCategory: CategoryType | null = null;
 
       if (editDraft.selectedGroup) {
-        editGroup = groupLists.find(
-          (group) => group.id === editDraft.selectedGroup?.id,
-        ) ?? null;
+        editGroup =
+          groupLists.find(
+            (group) => group.id === editDraft.selectedGroup?.id,
+          ) ?? null;
 
         if (editDraft.selectedCategory && editGroup) {
           const foundCategory = editGroup.categories.find(
@@ -373,10 +374,10 @@ export default function BlogEditInner({
               LAYOUT_PADDING_ALONGSIDE,
             )}
           >
-            <div className="flex w-[720px] flex-col">
+            <div className="flex w-[760px] flex-col">
               {/* INPUT */}
               <textarea
-                className="flex h-auto min-h-20 w-full resize-none flex-wrap overflow-hidden rounded-md border-none bg-transparent px-2 py-4 text-5xl font-semibold leading-normal outline-none transition-colors placeholder:text-gray-100 hover:bg-gray-1 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+                className="mx-14 flex h-auto min-h-20 w-full resize-none flex-wrap overflow-hidden rounded-md border-none bg-transparent px-2 py-4 text-5xl font-semibold leading-normal outline-none transition-colors placeholder:text-gray-100 hover:bg-gray-1 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
                 placeholder={t("titlePlaceHolder")}
                 tabIndex={1}
                 value={title}
@@ -385,7 +386,10 @@ export default function BlogEditInner({
               />
 
               {/* DIVIDER */}
-              <Divider direction="horizontal" className={"w-full bg-gray-5"} />
+              <Divider
+                direction="horizontal"
+                className={"mx-14 w-full bg-gray-5"}
+              />
 
               {/* BLOCKNOTE EDITOR */}
               <BlockNoteView editor={editor} theme="light" editable={true} />
