@@ -3,10 +3,7 @@ import { UserResponseType } from "@/types/user";
 import axios from "axios";
 
 const ClientInstance = axios.create({
-  baseURL:
-    process.env.NODE_ENV === "production"
-      ? process.env.NEXT_PUBLIC_API_BASE_URL
-      : process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 5000,
   withCredentials: true,
   headers: {
@@ -48,9 +45,7 @@ ClientInstance.interceptors.response.use(
 
       // 토큰 갱신 - 일반 axios 사용
       await axios.post<UserResponseType>(
-        ((process.env.NODE_ENV === "production"
-          ? process.env.NEXT_PUBLIC_API_BASE_URL
-          : process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL) as string) +
+        (process.env.NEXT_PUBLIC_API_BASE_URL as string) +
           END_POINTS.POST_RENEW_ACCESS_TOKEN,
         {},
         {

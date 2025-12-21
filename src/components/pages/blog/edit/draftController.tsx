@@ -14,92 +14,67 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useAuthStore } from "@/store/auth";
 import useModalStore from "@/store/modal";
-import { CategoryType, GroupType, TagType, DraftType } from "@/types";
 import { cn } from "@/utils/cn";
-import { PartialBlock } from "@blocknote/core";
 import { format } from "date-fns";
 import { Plus, Save } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { useBlogEditorContext } from "@/contexts/BlogEditorContext";
+import {
+  getAllDrafts,
+  saveDraft as saveIndexedDBDraft,
+  deleteDraft as deleteIndexedDBDraft,
+  DraftData,
+} from "@/lib/indexedDB";
 
 interface DraftControllerProps {
-  isDraftOpen: boolean;
-  handleDraftOpen: (v?: boolean) => void;
-  handleEditValues: (
-    title: string,
-    content: PartialBlock[] | undefined,
-    group: GroupType | null,
-    category: CategoryType | null,
-    tags: TagType[],
-  ) => void;
-
   className?: string;
-
-  title: string;
-  content: PartialBlock[] | undefined;
-  selectedGroup: GroupType | null;
-  selectedCategory: CategoryType | null;
-  selectedTags: TagType[];
-
-  onSerialize: () => PartialBlock[] | undefined;
-  onDeserialize: (content: PartialBlock[]) => void;
 }
 
-const DraftController = ({
-  // OPEN
-  isDraftOpen,
-  handleDraftOpen,
-  //
-  handleEditValues,
-  className,
+const DraftController = ({ className }: DraftControllerProps) => {
+  // Context에서 모든 값 가져오기
+  const {
+    isDraftOpen,
+    handleDraftOpen,
+    loadDraftToEditor,
+    title,
+    editor,
+    draftId,
+    setDraftId,
+    selectedGroup,
+    selectedCategory,
+    selectedTags,
+    onSerialize,
+  } = useBlogEditorContext();
 
-  title,
-  content,
-  selectedGroup,
-  selectedCategory,
-  selectedTags,
-
-  onSerialize,
-  // onDeserialize,
-}: DraftControllerProps) => {
+  const content = onSerialize();
   const t = useTranslations("blogEdit.draft");
   const triggerClass = cn(
     "group flex h-10 min-w-24 cursor-pointer items-center justify-center gap-2 rounded-md px-4 transition-all hover:bg-gray-5 dark:hover:bg-gray-800",
     className,
   );
 
-  const user = useAuthStore((state) => state.user);
-  const [status, setStatus] = useState<string>(t("status.authChecking"));
-  const [drafts, setDrafts] = useState<DraftType[]>([]);
-  const [currentDraftId, setCurrentDraftId] = useState<number | null>(null);
+  const [status, setStatus] = useState<string>(t("status.none"));
+  const [drafts, setDrafts] = useState<DraftData[]>([]);
 
   // 현재 draft 상태 (props에서 가져온 값들)
   const currentDraft = useMemo(
     () => ({
-      id: currentDraftId || Date.now(),
+      id: draftId,
       title,
       content,
       selectedGroup,
       selectedCategory,
       selectedTags,
       lastUpdatedAt: new Date().toISOString(),
-      selected: true,
     }),
-    [
-      currentDraftId,
-      title,
-      content,
-      selectedGroup,
-      selectedCategory,
-      selectedTags,
-    ],
+    [draftId, title, content, selectedGroup, selectedCategory, selectedTags],
   );
 
   const openModal = useModalStore((state) => state.openModal);
-  const handleProcessPopup = async (
+  const handleOpenProcessPopup = async (
     title?: string,
     desc?: string,
     proceedLabel?: string,
@@ -113,95 +88,59 @@ const DraftController = ({
     return res;
   };
 
-  // localStorage 키 생성
-  const getDraftKey = useCallback(() => {
-    return user ? `${user.nickname}_drafts` : null;
-  }, [user]);
-
-  // localStorage에서 임시저장 목록 불러오기
-  const loadDraftsFromStorage = useCallback(() => {
-    const draftKey = getDraftKey();
-    if (!draftKey) return [];
-
+  // IndexedDB에서 모든 draft 목록 불러오기
+  const loadDraftsFromDB = useCallback(async () => {
     try {
-      const drafts = localStorage.getItem(draftKey);
-      return drafts ? JSON.parse(drafts) : [];
+      const allDrafts = await getAllDrafts();
+      setDrafts(allDrafts);
     } catch (error) {
       console.error("Draft 불러오기 실패:", error);
-      return [];
     }
-  }, [getDraftKey]);
+  }, []);
 
-  // localStorage에 임시저장 목록 저장
-  const saveDraftsToStorage = useCallback(
-    (draftsToSave: DraftType[]) => {
-      const draftKey = getDraftKey();
-      if (!draftKey) return;
-
-      try {
-        localStorage.setItem(draftKey, JSON.stringify(draftsToSave));
-      } catch (error) {
-        console.error("Draft 저장 실패:", error);
-      }
-    },
-    [getDraftKey],
-  );
-
-  // 임시저장 추가/업데이트 (state/localStorage)
+  // 임시저장 추가/업데이트 (IndexedDB)
   const saveDraft = useCallback(
-    (draftToSave: DraftType) => {
+    async (draftToSave: DraftData) => {
       setStatus(t("status.saving"));
       draftToSave.content = onSerialize();
 
-      setDrafts((prevDrafts) => {
-        const existingIndex = prevDrafts.findIndex(
-          (draft) => draft.id === draftToSave.id,
-        );
-        let newDrafts;
-
-        if (existingIndex >= 0) {
-          // 기존 draft 업데이트
-          newDrafts = [...prevDrafts];
-          newDrafts[existingIndex] = draftToSave;
-        } else {
-          // 새 draft 추가
-          newDrafts = [draftToSave, ...prevDrafts];
-        }
-
-        saveDraftsToStorage(newDrafts);
-        return newDrafts;
-      });
-
-      setTimeout(() => setStatus(t("status.none")), 1000);
+      try {
+        await saveIndexedDBDraft(draftToSave);
+        await loadDraftsFromDB();
+        setTimeout(() => setStatus(t("status.none")), 1000);
+      } catch (error) {
+        console.error("Draft 저장 실패:", error);
+        setStatus(t("status.none"));
+      }
     },
-
     // eslint-disable-next-line
-    [saveDraftsToStorage, onSerialize],
+    [onSerialize, loadDraftsFromDB],
   );
 
   // 임시저장 삭제
-  const deleteDraft = (draftId: number) => {
-    setDrafts((prevDrafts) => {
-      const newDrafts = prevDrafts.filter((draft) => draft.id !== draftId);
-      saveDraftsToStorage(newDrafts);
-      return newDrafts;
-    });
+  const deleteDraft = async (targetDraftId: number) => {
+    try {
+      await deleteIndexedDBDraft(targetDraftId);
+      await loadDraftsFromDB();
 
-    // 현재 선택된 draft가 삭제된 경우
-    if (currentDraftId === draftId) {
-      setCurrentDraftId(null);
+      // 현재 선택된 draft가 삭제된 경우 새 ID 생성
+      if (draftId === targetDraftId) {
+        setDraftId(Date.now());
+      }
+    } catch (error) {
+      console.error("Draft 삭제 실패:", error);
     }
   };
 
   // 임시저장 불러오기
-  const loadDraft = async (draftId: number) => {
-    const draft = drafts.find((d) => d.id === draftId);
+  const loadDraft = async (targetDraftId: number) => {
+    const draft = drafts.find((d) => d.id === targetDraftId);
     if (!draft) return;
 
     let res: boolean | undefined = false;
 
     if (title || content) {
-      res = await handleProcessPopup(
+      res = await handleOpenProcessPopup(
         t("modals.load.title"),
         t("modals.load.desc"),
       );
@@ -209,7 +148,7 @@ const DraftController = ({
       if (!res) return;
     }
 
-    setCurrentDraftId(draftId);
+    setDraftId(targetDraftId);
 
     let draftContent = undefined;
     if (Array.isArray(draft.content)) {
@@ -217,21 +156,22 @@ const DraftController = ({
     }
 
     // 에디터에 값 설정
-    handleEditValues(
+    loadDraftToEditor(
       draft.title,
       draftContent,
       draft.selectedGroup,
       draft.selectedCategory,
       draft.selectedTags,
+      targetDraftId,
     );
   };
 
   // 현재 내용으로 덮어쓰기
-  const overwriteDraft = async (draftId: number) => {
+  const overwriteDraft = async (targetDraftId: number) => {
     let res: boolean | undefined = false;
 
-    if (currentDraftId !== draftId && (title || content)) {
-      res = await handleProcessPopup(
+    if (draftId !== targetDraftId && (title || content)) {
+      res = await handleOpenProcessPopup(
         t("modals.overWrite.title"),
         t("modals.overWrite.desc"),
       );
@@ -241,68 +181,47 @@ const DraftController = ({
 
     const updatedDraft = {
       ...currentDraft,
-      id: draftId,
+      id: targetDraftId,
     };
 
-    setCurrentDraftId(draftId);
-    saveDraft(updatedDraft);
+    setDraftId(targetDraftId);
+    await saveDraft(updatedDraft);
   };
 
-  // 수동 저장
-  const handleManualSave = () => {
-    // 내용이 비어있으면 저장하지 않음
-    if (!title.trim() && !content) return;
+  // 새 draft 시작
+  const startNewDraft = async () => {
+    // 기존 draft를 최신 상태로 저장
+    await saveDraft(currentDraft);
 
-    saveDraft(currentDraft);
+    const latestContent = onSerialize();
+    const newId = Date.now();
+
+    const newDraft = {
+      ...currentDraft,
+      content: latestContent,
+      id: newId,
+      lastUpdatedAt: new Date().toISOString(),
+    };
+
+    setDraftId(newId);
+    await saveDraft(newDraft);
+    loadDraftToEditor(
+      newDraft.title || "",
+      Array.isArray(newDraft.content) ? newDraft.content : undefined,
+      newDraft.selectedGroup,
+      newDraft.selectedCategory,
+      newDraft.selectedTags,
+      newId,
+    );
   };
 
-  // // 새 draft 시작
-  const startNewDraft = () => {
-    const newDraft = { ...currentDraft };
-    newDraft.id = Date.now();
-    saveDraft(newDraft);
-    setCurrentDraftId(newDraft.id);
-    // handleEditValues("", undefined, null, null, []);
-  };
-
-  // 초기 로딩
+  // 초기 로딩 - IndexedDB에서 draft 목록 불러오기
   useEffect(() => {
-    if (typeof window === "undefined" || !user) {
-      setStatus(t("status.authChecking"));
-      return;
-    }
+    if (typeof window === "undefined") return;
 
-    setStatus(t("status.none"));
-    const savedDrafts = loadDraftsFromStorage();
-    setDrafts(savedDrafts);
-
+    loadDraftsFromDB();
     // eslint-disable-next-line
-  }, [user, loadDraftsFromStorage]);
-
-  // 마지막 입력 후 30초마다 자동저장
-  useEffect(() => {
-    if (!user || (!title.trim() && !content)) return;
-
-    const timeoutId = setTimeout(() => {
-      saveDraft(currentDraft);
-    }, 30000); // 30초 디바운스
-
-    return () => clearTimeout(timeoutId);
-  }, [user, currentDraft, saveDraft, title, content]);
-
-  // 내용 변경 시 currentDraftId 설정 (새 글 작성 시)
-  useEffect(() => {
-    if (!currentDraftId && title.trim()) {
-      setCurrentDraftId(Date.now());
-    }
-  }, [
-    currentDraftId,
-    title,
-    content,
-    selectedCategory,
-    selectedGroup,
-    selectedTags,
-  ]);
+  }, []);
 
   return (
     <Popover open={isDraftOpen} onOpenChange={handleDraftOpen}>
@@ -360,7 +279,7 @@ const DraftController = ({
                           : t("noTitle")}
                       </span>
 
-                      {draft.id === currentDraftId && (
+                      {draft.id === draftId && (
                         <div
                           className={cn(
                             "flex h-4 items-center rounded-sm border border-red-200 bg-red-50 px-0.5 text-[8px] text-red-400",

@@ -13,6 +13,7 @@ Bumang Route53은 프론트엔드 개발자의 포트폴리오와 기술 블로�
 ## 주요 기능
 
 ### 블로그 시스템
+
 - 카테고리 및 태그 기반 글 분류 시스템
 - 페이지네이션이 적용된 글 목록 (리스트/썸네일 뷰)
 - 공개/비공개 글 관리
@@ -20,11 +21,13 @@ Bumang Route53은 프론트엔드 개발자의 포트폴리오와 기술 블로�
 - 댓글 시스템 (Utterances)
 
 ### 포트폴리오
+
 - 프로젝트 상세 페이지
 - 인터랙티브한 프로젝트 소개
 - Play 섹션 (개인 작업물/갤러리)
 
 ### 기술적 특징
+
 - **다국어 지원**: 한국어/영어 (next-intl)
 - **인증 시스템**: JWT 기반 로그인
 - **반응형 디자인**: 모바일/태블릿/데스크톱 대응
@@ -35,16 +38,19 @@ Bumang Route53은 프론트엔드 개발자의 포트폴리오와 기술 블로�
 ## 기술 스택
 
 ### Core Framework
+
 - **Next.js 14**: App Router, Server Components, Server Actions
 - **React 18**: 최신 React 기능 활용
 - **TypeScript**: 타입 안전성 보장
 
 ### Styling
+
 - **Tailwind CSS**: 유틸리티 기반 스타일링
 - **Radix UI**: 접근성 높은 컴포넌트 라이브러리
 - **Tailwind Animations**: 커스텀 애니메이션
 
 ### State Management & Data Fetching
+
 - **Zustand**: 경량 상태 관리
 - **TanStack Query (React Query)**: 서버 상태 관리
 - **@suspensive/react**: Suspense 기반 선언적 비동기 처리
@@ -52,6 +58,7 @@ Bumang Route53은 프론트엔드 개발자의 포트폴리오와 기술 블로�
 - **Axios**: HTTP 클라이언트
 
 ### Content Editor
+
 - **Yoopta Editor**: 블로그 글 작성용 에디터
   - Accordion, Blockquote, Callout, Code
   - Image, Video, File Upload
@@ -59,23 +66,28 @@ Bumang Route53은 프론트엔드 개발자의 포트폴리오와 기술 블로�
   - Markdown 내보내기
 
 ### UI/UX Libraries
+
 - **GSAP**: 고급 애니메이션
 - **Lenis**: 부드러운 스크롤
 - **Three.js**: 3D 그래픽 (인터랙티브 배경)
 - **Lottie**: 애니메이션 파일 재생
 
 ### Form & Validation
+
 - **React Hook Form**: 폼 상태 관리
 - **Zod**: 스키마 기반 유효성 검사
 
 ### Internationalization
+
 - **next-intl**: Next.js 다국어 지원
 
 ### Authentication
+
 - **jose**: JWT 토큰 처리
 - **jwt-decode**: JWT 디코딩
 
 ### Development Tools
+
 - **ESLint**: 코드 품질 관리
 - **Prettier**: 코드 포맷팅
 - **SVGR**: SVG를 React 컴포넌트로 변환
@@ -122,27 +134,32 @@ bumang-blog-front/
 ## 시작하기
 
 ### 사전 요구사항
+
 - Node.js 20 이상
 - npm 또는 yarn
 
 ### 설치 및 실행
 
 1. 의존성 설치
+
 ```bash
 npm install
 ```
 
 2. 개발 서버 실행 (포트 4000)
+
 ```bash
 npm run dev
 ```
 
 3. 프로덕션 빌드
+
 ```bash
 npm run build
 ```
 
 4. 프로덕션 서버 실행
+
 ```bash
 npm start
 ```
@@ -153,7 +170,6 @@ npm start
 
 ```env
 NEXT_PUBLIC_API_BASE_URL=https://your-api-url.com
-NEXT_PUBLIC_LOCAL_API_BASE_URL=http://localhost:your-port
 ```
 
 ## 배포
@@ -181,6 +197,7 @@ npm run deploy
 ### 1. Next.js Middleware 기반 보안 및 인증 시스템
 
 **Rate Limiting & 크롤러 관리** ([src/middleware.ts](src/middleware.ts))
+
 - 악성 봇 차단: amazonbot, ahrefsbot, semrushbot 등 차단 목록 관리
 - 검증된 봇 허용: Googlebot, Bingbot 등은 제한적 접근 허용 (1분 100회)
 - IP 기반 Rate Limiting: 일반 사용자 1분 60회, 봇 1분 100회 제한
@@ -188,6 +205,7 @@ npm run deploy
 - 메모리 기반 요청 카운팅 (1000개 제한, 자동 정리)
 
 **자동 토큰 갱신 시스템**
+
 - Middleware에서 AccessToken 자동 검증
 - AccessToken 만료 시 RefreshToken으로 자동 재발급
 - 재발급 실패 시 쿠키 자동 정리 (클린업)
@@ -196,29 +214,36 @@ npm run deploy
 ### 2. 서버/클라이언트 하이브리드 아키텍처
 
 **서버 컴포넌트 인증 처리**
+
 - Middleware에서 검증된 AccessToken을 서버 컴포넌트에서 활용
 - 쿠키 기반 인증 정보로 SSR 시 권한별 콘텐츠 제공
 - 비공개 글, 초안 등 권한 기반 렌더링
 
 **클라이언트 사이드 에러 핸들링**
+
 - React Suspense를 활용한 로딩 상태 관리
 - ErrorBoundary를 활용한 컴포넌트 단위 에러 처리
 - UI 컴포넌트별 관심사 분리로 독립적인 에러 관리
 - TanStack Query와 결합하여 선언적 데이터 페칭
 
 ### 3. 커스텀 에디터 통합
+
 Yoopta Editor를 활용하여 블록 기반의 풍부한 텍스트 편집 기능을 제공합니다.
 
 ### 4. 서버/클라이언트 컴포넌트 분리
+
 Next.js 14의 Server Components를 적극 활용하여 성능을 최적화했습니다.
 
 ### 5. 타입 안전성
+
 TypeScript와 Zod를 활용하여 엔드-투-엔드 타입 안전성을 확보했습니다.
 
 ### 6. 인터랙티브 배경
+
 Three.js를 활용한 3D 인터랙티브 배경 효과를 구현했습니다.
 
 ### 7. 접근성
+
 Radix UI를 기반으로 ARIA 표준을 준수하는 접근성 높은 UI를 구현했습니다.
 
 ## 라이선스

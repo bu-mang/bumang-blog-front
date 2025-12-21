@@ -15,85 +15,27 @@ import {
 import { useRouter } from "@/i18n/navigation";
 import { TagType, GroupType, CategoryType } from "@/types";
 import DraftController from "../draftController";
-import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { PublishDrawer } from "@/components/pages/blog/edit/blogEditToolBar/publishDrawer";
 import { useTranslations } from "next-intl";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
 import { useTheme } from "next-themes";
-import { SaveStatus } from "@/hooks/useAutoSave";
+import { useBlogEditorContext } from "@/contexts/BlogEditorContext";
 
-interface BlogEditorToolBarProps {
-  // List
-  groupLists: GroupType[];
+const BlogEditorToolBar = () => {
+  // Context에서 모든 값 가져오기
+  const {
+    groupLists,
+    selectedGroup,
+    onChangeSelectedGroup,
+    selectedCategory,
+    onChangeSelectedCategory,
+    selectedTags,
+    unselectedTags,
+    handleSwitchTags,
+    // saveStatus,
+    // lastSavedAt,
+  } = useBlogEditorContext();
 
-  // Group
-  selectedGroup: GroupType | null;
-  onChangeSelectedGroup: (v: GroupType) => void;
-
-  // Category
-  selectedCategory: CategoryType | null;
-  onChangeSelectedCategory: (v: CategoryType) => void;
-
-  selectedTags: TagType[];
-  unselectedTags: TagType[];
-  handleSwitchTags: (v: {
-    targetId: number;
-    from: "selectedTags" | "unselectedTags";
-  }) => void;
-
-  // Draft
-  isDraftOpen: boolean;
-  handleDraftOpen: () => void;
-  handleEditValues: (
-    title: string,
-    content: PartialBlock[] | undefined,
-    group: GroupType | null,
-    category: CategoryType | null,
-    tags: TagType[],
-  ) => void;
-
-  editorValue?: PartialBlock[];
-  title: string;
-
-  editor: BlockNoteEditor | null;
-  onSerialize: () => PartialBlock[] | undefined;
-  onDeserialize: (content: PartialBlock[]) => void;
-  onDisablePrevent: () => void;
-
-  // Auto-save status
-  saveStatus?: SaveStatus;
-  lastSavedAt?: Date | null;
-}
-
-const BlogEditorToolBar = ({
-  groupLists,
-
-  //
-  selectedGroup,
-  onChangeSelectedGroup,
-
-  //
-  selectedCategory,
-  onChangeSelectedCategory,
-
-  selectedTags,
-  unselectedTags,
-  handleSwitchTags,
-
-  // Draft
-  isDraftOpen,
-  handleDraftOpen,
-  handleEditValues,
-
-  // publish
-  title,
-  editor,
-  editorValue,
-  onDisablePrevent,
-
-  onSerialize,
-  onDeserialize,
-}: BlogEditorToolBarProps) => {
   // i18n
   const t = useTranslations("blogEdit");
   const [mounted, setMounted] = useState(false);
@@ -113,7 +55,7 @@ const BlogEditorToolBar = ({
     if (!selectedGroup?.categories) return;
 
     const categoryBelongsToGroup = selectedGroup.categories.some(
-      (cat) => cat.id === selectedCategory?.id
+      (cat) => cat.id === selectedCategory?.id,
     );
 
     // 현재 선택된 카테고리가 그룹에 속해있으면 건드리지 않음
@@ -142,6 +84,57 @@ const BlogEditorToolBar = ({
   const handleGoBack = () => {
     router.push(PATHNAME.BLOG);
   };
+
+  /**
+   * @Auto-save_상태_포맷팅
+   */
+  // const formatSaveTime = (date: Date | null | undefined) => {
+  //   if (!date) return "";
+
+  //   const now = new Date();
+  //   const diff = Math.floor((now.getTime() - date.getTime()) / 1000); // 초 단위
+
+  //   if (diff < 60) {
+  //     return t("header.autoSave.justNow");
+  //   } else if (diff < 3600) {
+  //     const minutes = Math.floor(diff / 60);
+  //     return t("header.autoSave.minutesAgo", { minutes });
+  //   } else {
+  //     const hours = Math.floor(diff / 3600);
+  //     return t("header.autoSave.hoursAgo", { hours });
+  //   }
+  // };
+
+  // const renderAutoSaveStatus = () => {
+  //   if (!saveStatus || saveStatus === "idle") return null;
+
+  //   const statusConfig = {
+  //     saving: {
+  //       icon: <LoaderIcon className="h-3 w-3 animate-spin text-gray-400" />,
+  //       text: t("header.autoSave.saving"),
+  //       color: "text-gray-400",
+  //     },
+  //     saved: {
+  //       icon: <CheckIcon className="h-3 w-3 text-green-500" />,
+  //       text: formatSaveTime(lastSavedAt),
+  //       color: "text-gray-400",
+  //     },
+  //     error: {
+  //       icon: <AlertCircleIcon className="h-3 w-3 text-red-500" />,
+  //       text: t("header.autoSave.error"),
+  //       color: "text-red-500",
+  //     },
+  //   };
+
+  //   const config = statusConfig[saveStatus];
+
+  //   return (
+  //     <div className="flex items-center gap-1.5 text-xs">
+  //       {config.icon}
+  //       <span className={config.color}>{config.text}</span>
+  //     </div>
+  //   );
+  // };
 
   return (
     <div className="fixed left-0 top-0 z-10 flex h-14 w-full border-b-[1px] border-gray-5 bg-background shadow-sm">
@@ -193,38 +186,18 @@ const BlogEditorToolBar = ({
         />
       </div>
 
+      {/* AUTO-SAVE STATUS */}
+      {/* <div className="flex items-center px-4">
+        {renderAutoSaveStatus()}
+      </div> */}
+
       {/* RIGHT MODULE */}
       <div className="flex flex-1 items-center justify-end pr-4">
-        <DraftController
-          isDraftOpen={isDraftOpen}
-          handleDraftOpen={handleDraftOpen}
-          handleEditValues={handleEditValues}
-          className="ml-2"
-          title={title}
-          content={editorValue}
-          selectedGroup={selectedGroup}
-          selectedCategory={selectedCategory}
-          selectedTags={selectedTags}
-          onSerialize={onSerialize}
-          onDeserialize={onDeserialize}
-        />
+        <DraftController className="ml-2" />
         <Divider className="ml-3" />
 
         {/* 발행 버튼 */}
-        <PublishDrawer
-          editor={editor}
-          // 타이틀
-          title={title}
-          // 본문 => previewText, thumbnail
-          editorValue={editorValue}
-          // group,
-          selectedGroup={selectedGroup}
-          selectedCategory={selectedCategory}
-          // tags
-          selectedTags={selectedTags}
-          onSerialize={onSerialize}
-          onDisablePrevent={onDisablePrevent}
-        />
+        <PublishDrawer />
       </div>
     </div>
   );

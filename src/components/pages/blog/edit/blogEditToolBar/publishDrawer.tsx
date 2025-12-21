@@ -15,9 +15,8 @@ import { LuPlaneTakeoff as PublishPlaneIcon } from "react-icons/lu";
 import { getButtonColorStyle } from "@/utils/styles/filButtonManager";
 import { Tag } from "../../../../common/tag";
 import { ButtonBase } from "../../../../common/button";
-import { CategoryType, GroupType, RoleType, TagType } from "@/types";
+import { RoleType } from "@/types";
 import { cn } from "@/utils/cn";
-import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
@@ -31,28 +30,21 @@ import { getThumbnailByGroup } from "@/utils/getThumnailByGroup";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { CreatePostDto } from "@/types/dto/blog/edit";
 import { useTranslations } from "next-intl";
+import { useBlogEditorContext } from "@/contexts/BlogEditorContext";
 
-interface DrawerSheetProps {
-  title: string;
-  editorValue?: PartialBlock[];
-  selectedGroup: GroupType | null;
-  selectedCategory: CategoryType | null;
-  selectedTags: TagType[];
-  editor: BlockNoteEditor | null;
-  onSerialize: () => PartialBlock[] | undefined;
-  onDisablePrevent: () => void;
-}
+export function PublishDrawer() {
+  // Context에서 모든 값 가져오기
+  const {
+    title,
+    editor,
+    selectedGroup,
+    selectedCategory,
+    selectedTags,
+    onSerialize,
+    onDisablePrevent,
+  } = useBlogEditorContext();
 
-export function PublishDrawer({
-  title,
-  editorValue,
-  selectedGroup,
-  selectedCategory,
-  selectedTags,
-  editor,
-  onSerialize,
-  onDisablePrevent,
-}: DrawerSheetProps) {
+  const editorValue = onSerialize();
   const t = useTranslations("blogEdit.publish");
   const { fillStyle: DarkFillStyle, textStyle: DarkTextStyle } =
     getButtonColorStyle("dark");

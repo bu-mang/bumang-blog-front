@@ -177,10 +177,7 @@ export default async function middleware(request: NextRequest) {
       if (refreshToken) {
         try {
           // API 서버에서 토큰 재발급 요청
-          const apiBaseUrl =
-            process.env.NODE_ENV === "production"
-              ? process.env.NEXT_PUBLIC_API_BASE_URL
-              : process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL;
+          const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
           const refreshResponse = await fetch(
             `${apiBaseUrl}${END_POINTS.POST_RENEW_ACCESS_TOKEN}`,

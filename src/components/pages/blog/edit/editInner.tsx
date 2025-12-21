@@ -10,6 +10,7 @@ import { Divider } from "@/components/common";
 import { BlogEditorToolBar } from "@/components/pages";
 import { EditorErrorBoundary } from "@/components/error/EditorErrorBoundary";
 import { postCreatePreSignedUrl, postUploadS3 } from "@/services/api/blog/edit";
+import { BlogEditorProvider } from "@/contexts/BlogEditorContext";
 
 import { CategoryType, GroupType, TagType } from "@/types";
 import { cn } from "@/utils/cn";
@@ -46,55 +47,60 @@ export default function BlogEditInner({
   const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
   const [unselectedTags, setUnselectedTags] = useState<TagType[]>(tagLists);
 
-  const handleChangeSelectedGroup = (v: GroupType) => {
+  const handleChangeSelectedGroup = useCallback((v: GroupType) => {
     setSelectedGroup(v);
-  };
+  }, []);
 
-  const handleChangeSelectedCategory = (v: CategoryType) => {
+  const handleChangeSelectedCategory = useCallback((v: CategoryType) => {
     setSelectedCategory(v);
-  };
+  }, []);
 
-  const handleSwitchTags = ({
-    targetId,
-    from,
-  }: {
-    targetId: number;
-    from: "selectedTags" | "unselectedTags";
-  }) => {
-    if (from === "selectedTags") {
-      const foundIndex = selectedTags.findIndex((item) => item.id === targetId);
-      if (foundIndex === -1) return;
+  const handleSwitchTags = useCallback(
+    ({
+      targetId,
+      from,
+    }: {
+      targetId: number;
+      from: "selectedTags" | "unselectedTags";
+    }) => {
+      if (from === "selectedTags") {
+        const foundIndex = selectedTags.findIndex(
+          (item) => item.id === targetId,
+        );
+        if (foundIndex === -1) return;
 
-      const newUnselectedTags = sortStringOrder([
-        selectedTags[foundIndex],
-        ...unselectedTags,
-      ]);
-      const newSelectedTags = [...selectedTags].filter(
-        (item) => item.id !== selectedTags[foundIndex].id,
-      );
+        const newUnselectedTags = sortStringOrder([
+          selectedTags[foundIndex],
+          ...unselectedTags,
+        ]);
+        const newSelectedTags = [...selectedTags].filter(
+          (item) => item.id !== selectedTags[foundIndex].id,
+        );
 
-      setSelectedTags(newSelectedTags);
-      setUnselectedTags(newUnselectedTags);
-    } else if (from === "unselectedTags") {
-      const foundIndex = unselectedTags.findIndex(
-        (item) => item.id === targetId,
-      );
-      if (foundIndex === -1) return;
+        setSelectedTags(newSelectedTags);
+        setUnselectedTags(newUnselectedTags);
+      } else if (from === "unselectedTags") {
+        const foundIndex = unselectedTags.findIndex(
+          (item) => item.id === targetId,
+        );
+        if (foundIndex === -1) return;
 
-      const newSelectedTags = [unselectedTags[foundIndex], ...selectedTags];
-      const newUnselectedTags = [...unselectedTags].filter(
-        (item) => item.id !== unselectedTags[foundIndex].id,
-      );
+        const newSelectedTags = [unselectedTags[foundIndex], ...selectedTags];
+        const newUnselectedTags = [...unselectedTags].filter(
+          (item) => item.id !== unselectedTags[foundIndex].id,
+        );
 
-      setSelectedTags(newSelectedTags);
-      setUnselectedTags(sortStringOrder(newUnselectedTags));
-    }
-  };
+        setSelectedTags(newSelectedTags);
+        setUnselectedTags(sortStringOrder(newUnselectedTags));
+      }
+    },
+    [selectedTags, unselectedTags],
+  );
 
   // ------------- 본문 로직 -------------
 
   const [title, setTitle] = useState("");
-  const [draftId] = useState(() => Date.now());
+  const [draftId, setDraftId] = useState(() => Date.now());
 
   const handleChangeTitle = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTitle(e.target.value);
@@ -138,7 +144,7 @@ export default function BlogEditInner({
       selectedTags,
       lastUpdatedAt: new Date().toISOString(),
     };
-  }, [draftId, title, selectedGroup, selectedCategory, selectedTags]);
+  }, [draftId, title, selectedGroup, selectedCategory, selectedTags, editor]);
 
   const { saveStatus, lastSavedAt, emergencySave } = useAutoSave({
     enabled: true,
@@ -156,42 +162,49 @@ export default function BlogEditInner({
   // ------------- 임시저장 DRAFT 로직 -------------
 
   const [isDraftOpen, setIsDraftOpen] = useState(false);
-  const handleDraftOpen = () => setIsDraftOpen((prev) => !prev);
+  const handleDraftOpen = useCallback(
+    () => setIsDraftOpen((prev) => !prev),
+    [],
+  );
 
-  const handleEditValues = (
-    title: string,
-    value: PartialBlock[] | undefined,
-    group: GroupType | null,
-    category: CategoryType | null,
-    tags: TagType[],
-  ) => {
-    setTitle(title);
-
-    // BlockNote content 복원
-    if (value && editor) {
-      editor.replaceBlocks(
-        editor.document,
-        value,
-      );
-    }
-
-    setSelectedGroup(group);
-    setSelectedCategory(category);
-
-    const selected: TagType[] = [];
-    const unselected: TagType[] = [];
-    tagLists.forEach((item) => {
-      const titles = tags.map((item) => item.title);
-      if (titles.includes(item.title)) {
-        selected.push(item);
-      } else {
-        unselected.push(item);
+  const loadDraftToEditor = useCallback(
+    (
+      title: string,
+      content: PartialBlock[] | undefined,
+      group: GroupType | null,
+      category: CategoryType | null,
+      tags: TagType[],
+      nextDraftId?: number,
+    ) => {
+      setTitle(title);
+      if (nextDraftId) {
+        setDraftId(nextDraftId);
       }
-    });
 
-    setSelectedTags(selected);
-    setUnselectedTags(unselected);
-  };
+      // BlockNote content 복원
+      if (content && editor) {
+        editor.replaceBlocks(editor.document, content);
+      }
+
+      setSelectedGroup(group);
+      setSelectedCategory(category);
+
+      const selected: TagType[] = [];
+      const unselected: TagType[] = [];
+      tagLists.forEach((item) => {
+        const titles = tags.map((item) => item.title);
+        if (titles.includes(item.title)) {
+          selected.push(item);
+        } else {
+          unselected.push(item);
+        }
+      });
+
+      setSelectedTags(selected);
+      setUnselectedTags(unselected);
+    },
+    [editor, tagLists],
+  );
 
   // ------------- 수정 페이지 Draft 로드 -------------
 
@@ -223,24 +236,14 @@ export default function BlogEditInner({
         }
       }
 
-      if (editDraft.title) {
-        setTitle(editDraft.title);
-      }
-
-      if (editDraft.content && editor && Array.isArray(editDraft.content)) {
-        // BlockNote content 복원
-        editor.replaceBlocks(
-          editor.document,
-          editDraft.content,
-        );
-      }
+      // Group과 Category 찾기
+      let editGroup: GroupType | null = null;
+      let editCategory: CategoryType | null = null;
 
       if (editDraft.selectedGroup) {
-        const editGroup = groupLists.find(
+        editGroup = groupLists.find(
           (group) => group.id === editDraft.selectedGroup?.id,
-        );
-
-        let editCategory: CategoryType | null = null;
+        ) ?? null;
 
         if (editDraft.selectedCategory && editGroup) {
           const foundCategory = editGroup.categories.find(
@@ -248,26 +251,27 @@ export default function BlogEditInner({
           );
           editCategory = foundCategory ?? null;
         }
-
-        setSelectedCategory(editCategory);
-        setSelectedGroup(editGroup ?? null);
       }
 
-      const selected: TagType[] = [];
-      const unselected: TagType[] = [];
+      // Tags 찾기
+      const selectedTags: TagType[] = [];
       if (editDraft.selectedTags) {
         const selectedTagIds = editDraft.selectedTags.map((item) => item.id);
         tagLists.forEach((tag) => {
           if (selectedTagIds.includes(tag.id)) {
-            selected.push(tag);
-          } else {
-            unselected.push(tag);
+            selectedTags.push(tag);
           }
         });
       }
 
-      setSelectedTags(selected);
-      setUnselectedTags(unselected);
+      // loadDraftToEditor로 통일
+      loadDraftToEditor(
+        editDraft.title ?? "",
+        Array.isArray(editDraft.content) ? editDraft.content : undefined,
+        editGroup,
+        editCategory,
+        selectedTags,
+      );
     };
 
     handleLoadDraft();
@@ -276,10 +280,10 @@ export default function BlogEditInner({
 
   // ------------- 페이지 이탈 방지 -------------
 
-  const hasContent = useMemo(() => !!title || !!editor?.document, [
-    title,
-    editor,
-  ]);
+  const hasContent = useMemo(
+    () => !!title || !!editor?.document,
+    [title, editor],
+  );
 
   const { disablePrevent } = usePageLeavePrevent({
     enabled: hasContent,
@@ -293,73 +297,102 @@ export default function BlogEditInner({
     return editor.document;
   }, [editor]);
 
-  const getDeserializeContent = useCallback((content: PartialBlock[]) => {
-    if (!editor) return;
-    editor.replaceBlocks(editor.document, content);
-  }, [editor]);
+  const getDeserializeContent = useCallback(
+    (content: PartialBlock[]) => {
+      if (!editor) return;
+      editor.replaceBlocks(editor.document, content);
+    },
+    [editor],
+  );
+
+  const stateValue = useMemo(
+    () => ({
+      editor,
+      title,
+      draftId,
+      selectedGroup,
+      selectedCategory,
+      selectedTags,
+      unselectedTags,
+      isDraftOpen,
+      saveStatus,
+      lastSavedAt,
+    }),
+    [
+      editor,
+      title,
+      draftId,
+      selectedGroup,
+      selectedCategory,
+      selectedTags,
+      unselectedTags,
+      isDraftOpen,
+      saveStatus,
+      lastSavedAt,
+    ],
+  );
+
+  const actionsValue = useMemo(
+    () => ({
+      onChangeSelectedGroup: handleChangeSelectedGroup,
+      onChangeSelectedCategory: handleChangeSelectedCategory,
+      handleSwitchTags,
+      handleDraftOpen,
+      setDraftId,
+      loadDraftToEditor,
+      onSerialize: getSerializeContent,
+      onDeserialize: getDeserializeContent,
+      onDisablePrevent: disablePrevent,
+      groupLists,
+    }),
+    [
+      handleChangeSelectedGroup,
+      handleChangeSelectedCategory,
+      handleSwitchTags,
+      handleDraftOpen,
+      setDraftId,
+      loadDraftToEditor,
+      getSerializeContent,
+      getDeserializeContent,
+      disablePrevent,
+      groupLists,
+    ],
+  );
 
   return (
     <EditorErrorBoundary emergencySave={emergencySave}>
-      <main className="flex min-h-screen w-full flex-col">
-        {/* 상단 헤더 (ToolBar) */}
-        <BlogEditorToolBar
-          // Content
-          onSerialize={getSerializeContent}
-          onDeserialize={getDeserializeContent}
-          // Group
-          selectedGroup={selectedGroup}
-          onChangeSelectedGroup={handleChangeSelectedGroup}
-          groupLists={groupLists}
-          // Category
-          selectedCategory={selectedCategory}
-          onChangeSelectedCategory={handleChangeSelectedCategory}
-          // Tags
-          selectedTags={selectedTags}
-          unselectedTags={unselectedTags}
-          handleSwitchTags={handleSwitchTags}
-          // Draft
-          isDraftOpen={isDraftOpen}
-          handleDraftOpen={handleDraftOpen}
-          handleEditValues={handleEditValues}
-          // PUBLISH!
-          title={title}
-          editor={editor}
-          onDisablePrevent={disablePrevent}
-          // Auto-save status (새로 추가)
-          saveStatus={saveStatus}
-          lastSavedAt={lastSavedAt}
-        />
+      <BlogEditorProvider state={stateValue} actions={actionsValue}>
+        <main className="flex min-h-screen w-full flex-col">
+          {/* 상단 헤더 (ToolBar) */}
+          <BlogEditorToolBar />
 
-        {/* 본문 영역 */}
-        <div
-          className={cn(
-            "flex w-full flex-1 justify-center pt-24",
-            LAYOUT_PADDING_ALONGSIDE,
-          )}
-        >
-          <div className="flex w-[720px] flex-col">
-            {/* INPUT */}
-            <textarea
-              className="flex h-auto min-h-20 w-full resize-none flex-wrap overflow-hidden rounded-md border-none bg-transparent px-2 py-4 text-5xl font-semibold leading-normal outline-none transition-colors placeholder:text-gray-100 hover:bg-gray-1 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
-              placeholder={t("titlePlaceHolder")}
-              tabIndex={1}
-              value={title}
-              maxLength={48}
-              onChange={handleChangeTitle}
-            />
+          {/* 본문 영역 */}
+          <div
+            className={cn(
+              "flex w-full flex-1 justify-center pt-24",
+              LAYOUT_PADDING_ALONGSIDE,
+            )}
+          >
+            <div className="flex w-[720px] flex-col">
+              {/* INPUT */}
+              <textarea
+                className="flex h-auto min-h-20 w-full resize-none flex-wrap overflow-hidden rounded-md border-none bg-transparent px-2 py-4 text-5xl font-semibold leading-normal outline-none transition-colors placeholder:text-gray-100 hover:bg-gray-1 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+                placeholder={t("titlePlaceHolder")}
+                tabIndex={1}
+                value={title}
+                maxLength={48}
+                onChange={handleChangeTitle}
+              />
 
-            {/* DIVIDER */}
-            <Divider direction="horizontal" className={"w-full bg-gray-5"} />
+              {/* DIVIDER */}
+              <Divider direction="horizontal" className={"w-full bg-gray-5"} />
 
-            {/* BLOCKNOTE EDITOR */}
-            <BlockNoteView
-              editor={editor}
-              theme="light"
-              editable={true}
-            />
+              {/* BLOCKNOTE EDITOR */}
+              <BlockNoteView editor={editor} theme="light" editable={true} />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </BlogEditorProvider>
     </EditorErrorBoundary>
   );
 }

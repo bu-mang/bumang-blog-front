@@ -11,6 +11,15 @@ import PlayItem from "./play/playItem";
 
 import WorkItem from "./work/workItem";
 
+// Context exports
+export {
+  BlogEditorProvider,
+  useBlogEditorContext,
+  useBlogEditorState,
+  useBlogEditorActions,
+  type BlogEditorContextValue,
+} from "@/contexts/BlogEditorContext";
+
 export {
   // About
   SectionBox,
