@@ -1,3 +1,6 @@
+import type { WorkDetailConfig } from "@/types/work";
+import bannerImage from "@/assets/works/compressed/anttimeSwap.webp";
+
 export const SECTION_SERVER_COMPONENT = "SECTION_SERVER_COMPONENT";
 export const SECTION_SUSPENSE_ERROR_BOUNDARY =
   "SECTION_SUSPENSE_ERROR_BOUNDARY";
@@ -5,7 +8,7 @@ export const SECTION_WEB3 = "SECTION_WEB3";
 export const SECTION_SCORE_ANIM = "SECTION_SCORE_ANIM";
 export const SECTION_DEEPLINK_UPDATE = "SECTION_DEEPLINK_UPDATE";
 
-export const ANTTIME_SWAP_KO = {
+const ANTTIME_SWAP_KO = {
   backToList: "목록으로 돌아가기",
   left: {
     badge: ["포인트 토큰 교환", "에어드롭", "플랫폼"],
@@ -48,12 +51,13 @@ export const ANTTIME_SWAP_KO = {
       },
       relatedLink: {
         label: "관련링크",
-        value: [{ name: "공식", value: "https://anttime-exchange.web.app/" }],
-        testServiceAccount: {
-          title: "테스트용 계정",
-          email: "이메일",
-          password: "비밀번호",
-        },
+        value: [
+          {
+            name: "공식",
+            value: "https://anttime-exchange.web.app/",
+            icon: "link" as const,
+          },
+        ],
       },
     },
   },
@@ -161,7 +165,7 @@ export const ANTTIME_SWAP_KO = {
   ],
 };
 
-export const ANTTIME_SWAP_EN = {
+const ANTTIME_SWAP_EN = {
   backToList: "Back to List",
   left: {
     badge: ["Point Token Exchange", "Airdrop", "Platform"],
@@ -205,13 +209,12 @@ export const ANTTIME_SWAP_EN = {
       relatedLink: {
         label: "Related Links",
         value: [
-          { name: "Official", value: "https://anttime-exchange.web.app/" },
+          {
+            name: "Official",
+            value: "https://anttime-exchange.web.app/",
+            icon: "link" as const,
+          },
         ],
-        testServiceAccount: {
-          title: "Test Account",
-          email: "Email",
-          password: "Password",
-        },
       },
     },
   },
@@ -319,4 +322,13 @@ export const ANTTIME_SWAP_EN = {
       image: "",
     },
   ],
+};
+
+export const ANTTIME_SWAP_CONFIG: WorkDetailConfig = {
+  title: "ANTTIME SWAP",
+  bannerImage,
+  content: {
+    ko: ANTTIME_SWAP_KO,
+    en: ANTTIME_SWAP_EN,
+  },
 };

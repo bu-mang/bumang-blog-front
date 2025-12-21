@@ -1,18 +1,11 @@
+import { Detail } from "@/types/work";
 import { cn } from "@/utils/cn";
 import { CornerDownRight } from "lucide-react";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 
-type List = { subtitle: string; desc: string[]; list?: List[] }[];
-type ContentType = {
-  title: string;
-  titleDesc: string;
-  image: string | StaticImageData;
-
-  list: List;
-};
 interface SectionViewProps {
   id: string;
-  content: ContentType;
+  content: Detail;
   order: number;
   locale: "ko" | "en";
 }
@@ -83,14 +76,16 @@ export default function SectionView({
           order % 2 === 0 && "order-1 lg:order-1",
         )}
       >
-        <Image
-          src={content.image}
-          fill
-          alt={`${content.title}_image`}
-          style={{ objectFit: "cover" }}
-          placeholder="blur"
-          blurDataURL={content.image.toString()}
-        />
+        {content.image && (
+          <Image
+            src={content.image}
+            fill
+            alt={`${content.title}_image`}
+            style={{ objectFit: "cover" }}
+            placeholder="blur"
+            blurDataURL={content.image.toString()}
+          />
+        )}
       </div>
     </section>
   );

@@ -1,8 +1,5 @@
-export const SECTION_ENV_INTERGRATION = "SECTION_ENV_INTERGRATION";
-export const SECTION_ANIM_UPDATE = "SECTION_ANIM_UPDATE";
-export const SECTION_PUSH_SKIN_UPDATE = "SECTION_PUSH_SKIN_UPDATE";
-export const SECTION_RN_UPDATE = "SECTION_RN_UPDATE";
-export const SECTION_DEEPLINK_UPDATE = "SECTION_DEEPLINK_UPDATE";
+import type { WorkDetailConfig } from "@/types/work";
+import bannerImage from "@/assets/works/compressed/anttimeApp.webp";
 
 import attApp_anim from "@/assets/workDetails/anttimeApp/attApp_anim.gif";
 import attApp_buildType from "@/assets/workDetails/anttimeApp/attApp_buildType.png";
@@ -10,7 +7,13 @@ import attApp_referral from "@/assets/workDetails/anttimeApp/attApp_referral.png
 import attApp_skin from "@/assets/workDetails/anttimeApp/attApp_skin.png";
 import attApp_upgrade from "@/assets/workDetails/anttimeApp/attApp_upgrade.png";
 
-export const ANTTIME_APP_KO = {
+export const SECTION_ENV_INTERGRATION = "SECTION_ENV_INTERGRATION";
+export const SECTION_ANIM_UPDATE = "SECTION_ANIM_UPDATE";
+export const SECTION_PUSH_SKIN_UPDATE = "SECTION_PUSH_SKIN_UPDATE";
+export const SECTION_RN_UPDATE = "SECTION_RN_UPDATE";
+export const SECTION_DEEPLINK_UPDATE = "SECTION_DEEPLINK_UPDATE";
+
+const ANTTIME_APP_KO = {
   backToList: "목록으로 돌아가기",
   left: {
     badge: ["플레이스토어", "다운로드 80만", "Web3 포인트 채굴 앱"],
@@ -53,18 +56,19 @@ export const ANTTIME_APP_KO = {
             name: "Android",
             value:
               "https://play.google.com/store/apps/details?id=net.anttime.app",
+            icon: "google" as const,
           },
           {
             name: "iOS",
             value: "https://apps.apple.com/kr/app/anttime/id6449239746?l=en-GB",
+            icon: "apple" as const,
           },
-          { name: "공식", value: "https://anttime.net/" },
+          {
+            name: "공식",
+            value: "https://anttime.net/",
+            icon: "link" as const,
+          },
         ],
-        testServiceAccount: {
-          title: "테스트용 계정",
-          email: "이메일",
-          password: "비밀번호",
-        },
       },
     },
   },
@@ -197,7 +201,7 @@ export const ANTTIME_APP_KO = {
     },
   ],
 };
-export const ANTTIME_APP_EN = {
+const ANTTIME_APP_EN = {
   backToList: "Back to list",
   left: {
     badge: ["Google Play", "800K downloads", "Web3 point-mining app"],
@@ -240,18 +244,19 @@ export const ANTTIME_APP_EN = {
             name: "Android",
             value:
               "https://play.google.com/store/apps/details?id=net.anttime.app",
+            icon: "google" as const,
           },
           {
             name: "iOS",
             value: "https://apps.apple.com/kr/app/anttime/id6449239746?l=en-GB",
+            icon: "apple" as const,
           },
-          { name: "Official", value: "https://anttime.net/" },
+          {
+            name: "Official",
+            value: "https://anttime.net/",
+            icon: "link" as const,
+          },
         ],
-        testServiceAccount: {
-          title: "Test Account",
-          email: "Email",
-          password: "Password",
-        },
       },
     },
   },
@@ -373,7 +378,7 @@ export const ANTTIME_APP_EN = {
         {
           subtitle: "• Team rules",
           desc: [
-            "Developed deep links that redirect to the appropriate store based on the user’s OS.",
+            "Developed deep links that redirect to the appropriate store based on the user's OS.",
             "On first open after install, automatically extract referral query strings and prefill the referral code.",
             "Because Firebase Dynamic Links support is being discontinued, integrated deep links with the Google Play Install Referrer API to include the referral code.",
           ],
@@ -383,4 +388,13 @@ export const ANTTIME_APP_EN = {
       image: attApp_referral,
     },
   ],
+};
+
+export const ANTTIME_APP_CONFIG: WorkDetailConfig = {
+  title: "ANTTIME",
+  bannerImage,
+  content: {
+    ko: ANTTIME_APP_KO,
+    en: ANTTIME_APP_EN,
+  },
 };

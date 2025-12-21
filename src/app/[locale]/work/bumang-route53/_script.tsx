@@ -1,8 +1,5 @@
-export const SECTION_BACKEND = "SECTION_BACKEND";
-export const SECTION_RBAC = "SECTION_RBAC";
-export const SECTION_REACT_COMP = "SECTION_REACT_COMP";
-export const SECTION_SHADCN = "SECTION_SHADCN";
-export const SECTION_UTILS = "SECTION_UTILS";
+import type { WorkDetailConfig } from "@/types/work";
+import bannerImage from "@/assets/works/compressed/bumangRoute53.webp";
 
 import br_backend from "@/assets/workDetails/bumangRoute53/br_backend.png";
 import br_userRole from "@/assets/workDetails/bumangRoute53/br_userRole.png";
@@ -10,7 +7,13 @@ import br_serverComponents from "@/assets/workDetails/bumangRoute53/br_serverCom
 import br_headless from "@/assets/workDetails/bumangRoute53/br_headless.gif";
 import br_darkmode from "@/assets/workDetails/bumangRoute53/br_darkmode.gif";
 
-export const BUMANG_ROUTE53_KO = {
+export const SECTION_BACKEND = "SECTION_BACKEND";
+export const SECTION_RBAC = "SECTION_RBAC";
+export const SECTION_REACT_COMP = "SECTION_REACT_COMP";
+export const SECTION_SHADCN = "SECTION_SHADCN";
+export const SECTION_UTILS = "SECTION_UTILS";
+
+const BUMANG_ROUTE53_KO = {
   backToList: "목록으로 돌아가기",
   left: {
     badge: ["이 블로그", "풀스택으로", "만들었어요."],
@@ -46,11 +49,19 @@ export const BUMANG_ROUTE53_KO = {
       },
       relatedLink: {
         label: "관련링크",
-        value: [{ name: "서비스", value: "https://www.bumang.xyz" }],
+        value: [
+          {
+            name: "서비스",
+            value: "https://www.bumang.xyz",
+            icon: "link" as const,
+          },
+        ],
         testServiceAccount: {
           title: "테스트용 계정",
           email: "이메일",
           password: "비밀번호",
+          idValue: "blog_user\n@gmail.com",
+          passwordValue: "itsniceday250710",
         },
       },
     },
@@ -197,7 +208,7 @@ export const BUMANG_ROUTE53_KO = {
   ],
 };
 
-export const BUMANG_ROUTE53_EN = {
+const BUMANG_ROUTE53_EN = {
   backToList: "Back to List",
   left: {
     badge: ["This blog", "was built", "full-stack."],
@@ -233,11 +244,19 @@ export const BUMANG_ROUTE53_EN = {
       },
       relatedLink: {
         label: "Related Links",
-        value: [{ name: "Service", value: "https://www.bumang.xyz" }],
+        value: [
+          {
+            name: "Service",
+            value: "https://www.bumang.xyz",
+            icon: "link" as const,
+          },
+        ],
         testServiceAccount: {
           title: "Test Account",
           email: "Email",
           password: "Password",
+          idValue: "blog_user\n@gmail.com",
+          passwordValue: "itsniceday250710",
         },
       },
     },
@@ -384,4 +403,13 @@ export const BUMANG_ROUTE53_EN = {
       image: br_darkmode,
     },
   ],
+};
+
+export const BUMANG_ROUTE53_CONFIG: WorkDetailConfig = {
+  title: "BUMANG ROUTE53",
+  bannerImage,
+  content: {
+    ko: BUMANG_ROUTE53_KO,
+    en: BUMANG_ROUTE53_EN,
+  },
 };

@@ -1,8 +1,5 @@
-export const SECTION_WHOLE_PROCESS = "SECTION_WHOLE_PROCESS";
-export const SECTION_IN_APP_ADS = "SECTION_IN_APP_ADS";
-export const SECTION_VIRTUAL_LIST = "SECTION_VIRTUAL_LIST";
-export const SECTION_TAPPING_OPTIMIZATION = "SECTION_TAPPING_OPTIMIZATION";
-export const SECTION_TEAM_LEADER = "SECTION_TEAM_LEADER";
+import type { WorkDetailConfig } from "@/types/work";
+import bannerImage from "@/assets/works/compressed/seaPearl.webp";
 
 import sp_start from "@/assets/workDetails/seaPearl/sp_start.webp";
 import sp_ads from "@/assets/workDetails/seaPearl/sp_ads.gif";
@@ -10,7 +7,13 @@ import sp_virtual_list from "@/assets/workDetails/seaPearl/sp_virtual_list.png";
 import sp_interactive from "@/assets/workDetails/seaPearl/sp_interactive.gif";
 import sp_tab_caching from "@/assets/workDetails/seaPearl/sp_tab_caching.gif";
 
-export const ANTTIME_APP_KO = {
+export const SECTION_WHOLE_PROCESS = "SECTION_WHOLE_PROCESS";
+export const SECTION_IN_APP_ADS = "SECTION_IN_APP_ADS";
+export const SECTION_VIRTUAL_LIST = "SECTION_VIRTUAL_LIST";
+export const SECTION_TAPPING_OPTIMIZATION = "SECTION_TAPPING_OPTIMIZATION";
+export const SECTION_TEAM_LEADER = "SECTION_TEAM_LEADER";
+
+const SEA_PEARL_KO = {
   backToList: "목록으로 돌아가기",
   left: {
     badge: ["텔레그램 미니앱", "탭게임"],
@@ -51,13 +54,9 @@ export const ANTTIME_APP_KO = {
           {
             name: "서비스",
             value: "https://t.me/sea_pearl_game_bot?start=hhuvfp7ea85T99ald3hv",
+            icon: "link" as const,
           },
         ],
-        testServiceAccount: {
-          title: "테스트용 계정",
-          email: "이메일",
-          password: "비밀번호",
-        },
       },
     },
   },
@@ -218,7 +217,7 @@ export const ANTTIME_APP_KO = {
   ],
 };
 
-export const ANTTIME_APP_EN = {
+const SEA_PEARL_EN = {
   backToList: "Back to List",
   left: {
     badge: ["Telegram Mini App", "Tap Game"],
@@ -259,13 +258,9 @@ export const ANTTIME_APP_EN = {
           {
             name: "Service",
             value: "https://t.me/sea_pearl_game_bot?start=hhuvfp7ea85T99ald3hv",
+            icon: "link" as const,
           },
         ],
-        testServiceAccount: {
-          title: "Test Account",
-          email: "Email",
-          password: "Password",
-        },
       },
     },
   },
@@ -425,4 +420,13 @@ export const ANTTIME_APP_EN = {
       image: sp_interactive,
     },
   ],
+};
+
+export const SEA_PEARL_CONFIG: WorkDetailConfig = {
+  title: "SEA PEARL",
+  bannerImage,
+  content: {
+    ko: SEA_PEARL_KO,
+    en: SEA_PEARL_EN,
+  },
 };

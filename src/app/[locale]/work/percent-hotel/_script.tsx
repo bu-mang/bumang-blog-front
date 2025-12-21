@@ -1,8 +1,5 @@
-export const SECTION_MAIN_PAGE = "SECTION_MAIN_PAGE";
-export const SECTION_SELLER_REGISTER_PAGE = "SECTION_SELLER_REGISTER_PAGE";
-export const SECTION_PUSH_NOTIFICATION_PAGE = "SECTION_PUSH_NOTIFICATION_PAGE";
-export const SECTION_SEO = "SECTION_SEO";
-export const SECTION_TEAM_LEADER = "SECTION_TEAM_LEADER";
+import type { WorkDetailConfig } from "@/types/work";
+import bannerImage from "@/assets/works/compressed/percentHotel.webp";
 
 import ph_2nd from "@/assets/workDetails/percentHotel/ph_2nd.jpg";
 import ph_alarm_ios from "@/assets/workDetails/percentHotel/ph_alarm_ios.gif";
@@ -10,10 +7,22 @@ import ph_carousel from "@/assets/workDetails/percentHotel/ph_carousel.gif";
 import ph_post_price from "@/assets/workDetails/percentHotel/ph_post_price.gif";
 import ph_seo from "@/assets/workDetails/percentHotel/ph_seo.png";
 
-export const PERCENT_HOTEL_KO = {
+export const SECTION_MAIN_PAGE = "SECTION_MAIN_PAGE";
+export const SECTION_SELLER_REGISTER_PAGE = "SECTION_SELLER_REGISTER_PAGE";
+export const SECTION_PUSH_NOTIFICATION_PAGE = "SECTION_PUSH_NOTIFICATION_PAGE";
+export const SECTION_SEO = "SECTION_SEO";
+export const SECTION_TEAM_LEADER = "SECTION_TEAM_LEADER";
+
+const PERCENT_HOTEL_KO = {
   backToList: "목록으로 돌아가기",
   left: {
     badge: ["야놀자 테크 스쿨", "파이널 프로젝트", "종합 2위"],
+    badgeRenderFn: (badge: string[]) => (
+      <>
+        <span className="font-semibold">{badge[0]}</span> {badge[1]}{" "}
+        <span className="font-bold">{badge[2]}</span>
+      </>
+    ),
     summary: {
       title: "프로젝트 요약",
       period: {
@@ -49,13 +58,23 @@ export const PERCENT_HOTEL_KO = {
       relatedLink: {
         label: "관련링크",
         value: [
-          { name: "서비스", value: "https://percenthotel.web.app/" },
-          { name: "깃허브", value: "https://github.com/SCBJ-7/SCBJ-FE" },
+          {
+            name: "서비스",
+            value: "https://percenthotel.web.app/",
+            icon: "link" as const,
+          },
+          {
+            name: "깃허브",
+            value: "https://github.com/SCBJ-7/SCBJ-FE",
+            icon: "github" as const,
+          },
         ],
         testServiceAccount: {
           title: "테스트용 계정",
           email: "이메일",
           password: "비밀번호",
+          idValue: "qwerty029369\n@naver.com",
+          passwordValue: "qwerty123@",
         },
       },
     },
@@ -210,10 +229,16 @@ export const PERCENT_HOTEL_KO = {
   ],
 };
 
-export const PERCENT_HOTEL_EN = {
+const PERCENT_HOTEL_EN = {
   backToList: "Back to List",
   left: {
     badge: ["Total", "2nd", "in", "Yanolja Tech School", "Graduate"],
+    badgeRenderFn: (badge: string[]) => (
+      <>
+        {badge[0]} <span className="font-bold">{badge[1]}</span> {badge[2]}{" "}
+        <span className="font-semibold">{badge[3]}</span> {badge[4]}
+      </>
+    ),
     summary: {
       title: "Summary",
       period: {
@@ -249,13 +274,23 @@ export const PERCENT_HOTEL_EN = {
       relatedLink: {
         label: "Related Links",
         value: [
-          { name: "Service", value: "https://percenthotel.web.app/" },
-          { name: "Github", value: "https://github.com/SCBJ-7/SCBJ-FE" },
+          {
+            name: "Service",
+            value: "https://percenthotel.web.app/",
+            icon: "link" as const,
+          },
+          {
+            name: "Github",
+            value: "https://github.com/SCBJ-7/SCBJ-FE",
+            icon: "github" as const,
+          },
         ],
         testServiceAccount: {
           title: "Test Service Account",
           email: "Email",
           password: "Password",
+          idValue: "qwerty029369\n@naver.com",
+          passwordValue: "qwerty123@",
         },
       },
     },
@@ -414,4 +449,13 @@ export const PERCENT_HOTEL_EN = {
       image: ph_2nd,
     },
   ],
+};
+
+export const PERCENT_HOTEL_CONFIG: WorkDetailConfig = {
+  title: "Percent Hotel",
+  bannerImage,
+  content: {
+    ko: PERCENT_HOTEL_KO,
+    en: PERCENT_HOTEL_EN,
+  },
 };
