@@ -54,7 +54,7 @@ export type WorkDetailContent = {
   backToList: string;
   left: {
     badge: string[];
-    badgeRenderFn?: (badge: string[], locale: "ko" | "en") => React.ReactNode;
+    badgeStyles?: ("normal" | "semibold" | "bold")[];
     summary: {
       title: string;
       period: { label: string; value: string };

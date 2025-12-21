@@ -17,12 +17,7 @@ const PERCENT_HOTEL_KO = {
   backToList: "목록으로 돌아가기",
   left: {
     badge: ["야놀자 테크 스쿨", "파이널 프로젝트", "종합 2위"],
-    badgeRenderFn: (badge: string[]) => (
-      <>
-        <span className="font-semibold">{badge[0]}</span> {badge[1]}{" "}
-        <span className="font-bold">{badge[2]}</span>
-      </>
-    ),
+    badgeStyles: ["semibold" as const, "normal" as const, "bold" as const],
     summary: {
       title: "프로젝트 요약",
       period: {
@@ -233,12 +228,13 @@ const PERCENT_HOTEL_EN = {
   backToList: "Back to List",
   left: {
     badge: ["Total", "2nd", "in", "Yanolja Tech School", "Graduate"],
-    badgeRenderFn: (badge: string[]) => (
-      <>
-        {badge[0]} <span className="font-bold">{badge[1]}</span> {badge[2]}{" "}
-        <span className="font-semibold">{badge[3]}</span> {badge[4]}
-      </>
-    ),
+    badgeStyles: [
+      "normal" as const,
+      "bold" as const,
+      "normal" as const,
+      "semibold" as const,
+      "normal" as const,
+    ],
     summary: {
       title: "Summary",
       period: {

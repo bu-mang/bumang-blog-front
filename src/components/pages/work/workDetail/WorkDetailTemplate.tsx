@@ -50,10 +50,28 @@ export default function WorkDetailTemplate({
     window.scrollTo(0, 0);
   }, [setBackgroundColor]);
 
-  // Render badge with custom function if provided, otherwise default
+  // Render badge with custom styles if provided, otherwise default
   const renderBadge = () => {
-    if (CONTENT_LEFT.badgeRenderFn) {
-      return CONTENT_LEFT.badgeRenderFn(CONTENT_LEFT.badge, locale);
+    if (CONTENT_LEFT.badgeStyles) {
+      return (
+        <>
+          {CONTENT_LEFT.badge.map((text, index) => {
+            const style = CONTENT_LEFT.badgeStyles![index] || "normal";
+            const className =
+              style === "bold"
+                ? "font-bold"
+                : style === "semibold"
+                  ? "font-semibold"
+                  : "";
+            return (
+              <span key={index} className={className}>
+                {text}
+                {index < CONTENT_LEFT.badge.length - 1 && " "}
+              </span>
+            );
+          })}
+        </>
+      );
     }
 
     // Default badge rendering (used by most pages)
