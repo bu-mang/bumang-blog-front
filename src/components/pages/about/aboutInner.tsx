@@ -6,12 +6,18 @@ import { useEffect, useRef } from "react";
 
 import gsap from "gsap/all";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SectionBox, SubBox } from "@/components/pages";
+import { SectionBox } from "@/components/pages";
 import { cn } from "@/utils/cn";
 import { useTranslations } from "next-intl";
 import AboutBanner from "@/assets/about_banner.jpg";
-import { PATHNAME } from "@/constants/routes/pathnameRoutes";
 import { useHeaderStore } from "@/store/header";
+
+import LoginPrompt from "./LoginPrompt";
+import InfoRow from "./InfoRow";
+import RecordItem from "./RecordItem";
+import TechStackSection, {
+  type TechStackItemData,
+} from "./TechStackSection";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,30 +26,148 @@ interface AboutInnerProps {
   locale: string;
 }
 
-const KorLogin = () => (
-  <div>
-    <Link
-      href={PATHNAME.LOGIN}
-      className="text-gray-300 transition-all hover:bg-gray-800 hover:text-white"
-    >
-      로그인
-    </Link>{" "}
-    후 확인 가능합니다.
-  </div>
-);
+// Configuration arrays
+const records = [
+  { year: "2024 -", key: "record.2024", className: "border-none" },
+  { year: "2023", key: "record.2023" },
+  { year: "2022", key: "record.2022" },
+  { year: "2021", key: "record.2021" },
+  { year: "2019", key: "record.2019", className: "mb-16" },
+];
 
-const EngLogin = () => (
-  <div>
-    Please{" "}
-    <Link
-      href={PATHNAME.LOGIN}
-      className="text-gray-300 transition-all hover:bg-gray-800 hover:text-white"
-    >
-      Login
-    </Link>{" "}
-    to view this content.
-  </div>
-);
+const techStackSections: Array<{
+  category: string;
+  className?: string;
+  items: TechStackItemData[];
+}> = [
+  {
+    category: "Web Frontend",
+    className: "border-none",
+    items: [
+      { title: "React/Next.js", descriptionKey: "techStack.webFrontEnd.1.desc" },
+      {
+        title: "Tailwind, StyledComponent",
+        descriptionKey: "techStack.webFrontEnd.2.desc",
+      },
+      {
+        title: "React-Hook-Form, Zod",
+        descriptionKey: "techStack.webFrontEnd.3.desc",
+      },
+      {
+        title: "Axios, TanstackQuery",
+        descriptionKey: "techStack.webFrontEnd.4.desc",
+      },
+      {
+        title: "Zustand, ReduxToolkit",
+        descriptionKey: "techStack.webFrontEnd.5.desc",
+      },
+      {
+        title: "Gsap, Three.js, Motion",
+        descriptionKey: "techStack.webFrontEnd.6.desc",
+      },
+    ],
+  },
+  {
+    category: "Mobile Frontend",
+    items: [
+      {
+        title: "React Native",
+        descriptionKey: "techStack.appFrontEnd.1.desc",
+      },
+      { title: "StyleSheet", descriptionKey: "techStack.appFrontEnd.2.desc" },
+      {
+        title: "React Native Codepush",
+        descriptionKey: "techStack.appFrontEnd.3.desc",
+      },
+      {
+        title: "React Native Firebase FCM",
+        descriptionKey: "techStack.appFrontEnd.4.desc",
+      },
+      {
+        title: "React Native Reanimated",
+        descriptionKey: "techStack.appFrontEnd.5.desc",
+      },
+    ],
+  },
+  {
+    category: "Backend",
+    items: [
+      { title: "techStack.backend.1.title", descriptionKey: "techStack.backend.1.desc" },
+      { title: "techStack.backend.2.title", descriptionKey: "techStack.backend.2.desc" },
+      { title: "techStack.backend.3.title", descriptionKey: "techStack.backend.3.desc" },
+      { title: "techStack.backend.4.title", descriptionKey: "techStack.backend.4.desc" },
+      { title: "techStack.backend.5.title", descriptionKey: "techStack.backend.5.desc" },
+      { title: "techStack.backend.6.title", descriptionKey: "techStack.backend.6.desc" },
+    ],
+  },
+  {
+    category: "CI/CD",
+    items: [
+      { title: "techStack.cicd.1.title", descriptionKey: "techStack.cicd.1.desc" },
+      { title: "techStack.cicd.2.title", descriptionKey: "techStack.cicd.2.desc" },
+      { title: "techStack.cicd.3.title", descriptionKey: "techStack.cicd.3.desc" },
+    ],
+  },
+  {
+    category: "Design",
+    items: [
+      {
+        title: "techStack.design.1.title",
+        descriptionKey: "techStack.design.1.desc",
+      },
+      {
+        title: "techStack.design.2.title",
+        descriptionKey: "techStack.design.2.desc",
+      },
+      {
+        title: "techStack.design.3.title",
+        descriptionKey: "techStack.design.3.desc",
+      },
+      {
+        title: "techStack.design.4.title",
+        descriptionKey: "techStack.design.4.desc",
+      },
+      {
+        title: "techStack.design.5.title",
+        descriptionKey: "techStack.design.5.desc",
+      },
+    ],
+  },
+];
+
+const basicLevelSections: Array<{
+  category: string;
+  className?: string;
+  items: TechStackItemData[];
+}> = [
+  {
+    category: "Dev",
+    className: "border-none",
+    items: [
+      {
+        title: "techStack.basicLevel.1.title",
+        descriptionKey: "techStack.basicLevel.1.desc",
+      },
+      {
+        title: "techStack.basicLevel.2.title",
+        descriptionKey: "techStack.basicLevel.2.desc",
+      },
+      {
+        title: "techStack.basicLevel.3.title",
+        descriptionKey: "techStack.basicLevel.3.desc",
+      },
+    ],
+  },
+  {
+    category: "Design",
+    items: [
+      {
+        title: "techStack.basicLevel.4.title",
+        descriptionKey: "techStack.basicLevel.4.desc",
+      },
+    ],
+  },
+];
 
 export default function AboutInner({
   isAuthenticated,
@@ -113,107 +237,67 @@ export default function AboutInner({
         </div>
 
         <div className="col-span-full tbl:col-start-4 tbl:col-end-9 tbl:-translate-y-3">
-          <SubBox>
-            <span className="col-span-1 font-semibold">Moblie</span>
-            <span className="col-span-4">
-              {isAuthenticated ? (
-                "+82 10-4922-3563"
-              ) : locale === "ko" ? (
-                <KorLogin />
-              ) : (
-                <EngLogin />
-              )}
-            </span>
-          </SubBox>
+          <InfoRow
+            label="Moblie"
+            value={
+              isAuthenticated ? "+82 10-4922-3563" : <LoginPrompt locale={locale} />
+            }
+          />
 
-          <SubBox>
-            <span className="col-span-1 font-semibold">Email</span>
-            <span className="col-span-4">baughman0729@gmail.com</span>
-          </SubBox>
+          <InfoRow label="Email" value="baughman0729@gmail.com" />
 
-          <SubBox className="mb-16">
-            <span className="col-span-1 font-semibold">Links</span>
-            <div className="col-span-4 flex gap-2 text-gray-200">
-              <Link
-                href={
-                  "https://angry-munchkin-077.notion.site/Portfolio-e6622320a2284acea12280d82898e842?pvs=74"
-                }
-                className="transition-all hover:bg-gray-800 hover:text-white"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Notion
-              </Link>
-              <Link
-                href={"https://www.behance.net/calmness078ad4"}
-                className="transition-all hover:bg-gray-800 hover:text-white"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Behance
-              </Link>
-              <Link
-                href={"https://www.chess.com/member/blmnt/stats/rapid"}
-                className="transition-all hover:bg-gray-800 hover:text-white"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Chess.com
-              </Link>
-              {/* <Link
-                href={""}
-                className="transition-all hover:bg-gray-800 hover:text-white"
-              >
-                Instagram
-              </Link> */}
-            </div>
-          </SubBox>
+          <InfoRow
+            label="Links"
+            className="mb-16"
+            value={
+              <div className="col-span-4 flex gap-2 text-gray-200">
+                <Link
+                  href={
+                    "https://angry-munchkin-077.notion.site/Portfolio-e6622320a2284acea12280d82898e842?pvs=74"
+                  }
+                  className="transition-all hover:bg-gray-800 hover:text-white"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Notion
+                </Link>
+                <Link
+                  href={"https://www.behance.net/calmness078ad4"}
+                  className="transition-all hover:bg-gray-800 hover:text-white"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Behance
+                </Link>
+                <Link
+                  href={"https://www.chess.com/member/blmnt/stats/rapid"}
+                  className="transition-all hover:bg-gray-800 hover:text-white"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Chess.com
+                </Link>
+              </div>
+            }
+          />
         </div>
       </SectionBox>
 
       {/* AWARDS */}
-      {/* LAYOUT_PADDING_ALONGSIDE */}
       <SectionBox className={cn("fade-in-mount px-[2vw] md:px-[6vw]")}>
         <div className="top-20 col-span-full mb-3 text-6xl font-semibold tbl:sticky tbl:col-span-3 tbl:mb-20 tbl:h-32">
           Records
         </div>
 
         <div className="col-span-full tbl:col-start-4 tbl:col-end-9 tbl:-translate-y-3">
-          <SubBox className="border-none">
-            <div className="col-span-1 font-semibold">2024 -</div>
-            <div className="col-span-4 flex flex-col">
-              <span className="font-semibold">{t("record.2024.title")}</span>
-              <span className="text-gray-300">{t("record.2024.desc")}</span>
-            </div>
-          </SubBox>
-          <SubBox>
-            <div className="col-span-1 font-semibold">2023</div>
-            <div className="col-span-4 flex flex-col">
-              <span className="font-semibold">{t("record.2023.title")}</span>
-              <span className="text-gray-300">{t("record.2023.desc")}</span>
-            </div>
-          </SubBox>
-          <SubBox>
-            <div className="col-span-1 font-semibold">2022</div>
-            <div className="col-span-4 flex flex-col">
-              <span className="font-semibold">{t("record.2022.title")}</span>
-              <span className="text-gray-300">{t("record.2022.desc")}</span>
-            </div>
-          </SubBox>
-          <SubBox>
-            <div className="col-span-1 font-semibold">2021</div>
-            <div className="col-span-4 flex flex-col">
-              <span className="font-semibold">{t("record.2021.title")}</span>
-              <span className="text-gray-300">{t("record.2021.desc")}</span>
-            </div>
-          </SubBox>
-          <SubBox className="mb-16">
-            <div className="col-span-1 font-semibold">2019</div>
-            <div className="col-span-4 flex flex-col">
-              <span className="font-semibold">{t("record.2019.title")}</span>
-              <span className="text-gray-300">{t("record.2019.desc")}</span>
-            </div>
-          </SubBox>
+          {records.map((record) => (
+            <RecordItem
+              key={record.year}
+              year={record.year}
+              translationKey={record.key}
+              className={record.className}
+            />
+          ))}
         </div>
       </SectionBox>
 
@@ -225,221 +309,15 @@ export default function AboutInner({
         </div>
 
         <div className="col-span-full tbl:col-start-4 tbl:col-end-9 tbl:-translate-y-3">
-          {/* WEB */}
-          <SubBox className="gap-y-8 border-none text-sm">
-            <div className="col-span-full pr-2 font-semibold sm:col-span-1 sm:text-gray-200 md:row-span-3">
-              Web Frontend
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">React/Next.js</span>
-              <span className="text-gray-300">
-                {t("techStack.webFrontEnd.1.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">Tailwind, StyledComponent</span>
-              <span className="text-gray-300">
-                {t("techStack.webFrontEnd.2.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">React-Hook-Form, Zod</span>
-              <span className="text-gray-300">
-                {t("techStack.webFrontEnd.3.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">Axios, TanstackQuery</span>
-              <span className="text-gray-300">
-                {t("techStack.webFrontEnd.4.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">Zustand, ReduxToolkit</span>
-              <span className="text-gray-300">
-                {t("techStack.webFrontEnd.5.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">Gsap, Three.js, Motion</span>
-              <span className="text-gray-300">
-                {t("techStack.webFrontEnd.6.desc")}
-              </span>
-            </div>
-          </SubBox>
-
-          {/* MOBILE */}
-          <SubBox className="gap-y-8 text-sm">
-            <div className="col-span-full pr-2 font-semibold sm:col-span-1 sm:text-gray-200 md:row-span-3">
-              Mobile Frontend
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">React Native</span>
-              <span className="text-gray-300">
-                {t("techStack.appFrontEnd.1.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">StyleSheet</span>
-              <span className="text-gray-300">
-                {t("techStack.appFrontEnd.2.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">React Native Codepush</span>
-              <span className="text-gray-300">
-                {t("techStack.appFrontEnd.3.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">React Native Firebase FCM</span>
-              <span className="text-gray-300">
-                {t("techStack.appFrontEnd.4.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">React Native Reanimated</span>
-              <span className="text-gray-300">
-                {t("techStack.appFrontEnd.5.desc")}
-              </span>
-            </div>
-          </SubBox>
-
-          {/* BACKEND */}
-          <SubBox className="gap-y-8 text-sm">
-            <div className="col-span-full pr-2 font-semibold sm:col-span-1 sm:text-gray-200 md:row-span-3">
-              Backend
-            </div>
-
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.backend.1.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.backend.1.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">
-                {t("techStack.backend.2.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.backend.2.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.backend.3.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.backend.3.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">
-                {t("techStack.backend.4.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.backend.4.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.backend.5.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.backend.5.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">
-                {t("techStack.backend.6.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.backend.6.desc")}
-              </span>
-            </div>
-          </SubBox>
-
-          {/* CI/CD */}
-          <SubBox className="gap-y-8 text-sm">
-            <div className="col-span-full pr-2 font-semibold sm:col-span-1 sm:text-gray-200 md:row-span-3">
-              CI/CD
-            </div>
-
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.cicd.1.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.cicd.1.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">
-                {t("techStack.cicd.2.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.cicd.2.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.cicd.3.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.cicd.3.desc")}
-              </span>
-            </div>
-          </SubBox>
-
-          {/* DESIGN */}
-          <SubBox className="gap-y-8 text-sm">
-            <div className="col-span-full pr-2 font-semibold sm:col-span-1 sm:text-gray-200 md:row-span-3">
-              Design
-            </div>
-
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.design.1.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.design.1.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">
-                {t("techStack.design.2.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.design.2.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.design.3.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.design.3.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">
-                {t("techStack.design.4.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.design.4.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.design.5.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.design.5.desc")}
-              </span>
-            </div>
-          </SubBox>
+          {techStackSections.map((section, index) => (
+            <TechStackSection
+              key={section.category}
+              categoryLabel={section.category}
+              items={section.items}
+              className={section.className}
+              useTranslationForTitle={index >= 2} // Backend, CI/CD, Design use translation for title
+            />
+          ))}
         </div>
       </SectionBox>
 
@@ -451,53 +329,15 @@ export default function AboutInner({
         </div>
 
         <div className="col-span-full tbl:col-start-4 tbl:col-end-9 tbl:-translate-y-3">
-          {/* DEV */}
-          <SubBox className="gap-y-8 border-none text-sm">
-            <div className="col-span-1 pr-2 font-semibold md:row-span-3 md:mb-20">
-              Dev
-            </div>
-
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.basicLevel.1.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.basicLevel.1.desc")}
-              </span>
-            </div>
-            <div className="col-start-4 col-end-8 flex flex-col pl-2 sm:col-start-4 sm:col-end-6">
-              <span className="font-semibold">
-                {t("techStack.basicLevel.2.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.basicLevel.2.desc")}
-              </span>
-            </div>
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.basicLevel.3.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.basicLevel.3.desc")}
-              </span>
-            </div>
-          </SubBox>
-
-          {/* DESIGN */}
-          <SubBox className="gap-y-8 text-sm">
-            <div className="top-20 col-span-1 pr-2 font-semibold md:row-span-3 md:mb-20 tbl:sticky">
-              Design
-            </div>
-
-            <div className="col-start-1 col-end-4 flex flex-col sm:col-start-2 sm:col-end-4">
-              <span className="font-semibold">
-                {t("techStack.basicLevel.4.title")}
-              </span>
-              <span className="text-gray-300">
-                {t("techStack.basicLevel.4.desc")}
-              </span>
-            </div>
-          </SubBox>
+          {basicLevelSections.map((section) => (
+            <TechStackSection
+              key={section.category}
+              categoryLabel={section.category}
+              items={section.items}
+              className={section.className}
+              useTranslationForTitle={true}
+            />
+          ))}
         </div>
       </SectionBox>
     </main>

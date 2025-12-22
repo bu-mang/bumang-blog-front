@@ -1,4 +1,8 @@
 import { SectionBox, SubBox } from "./about/aboutSection";
+import LoginPrompt from "./about/LoginPrompt";
+import InfoRow from "./about/InfoRow";
+import RecordItem from "./about/RecordItem";
+import TechStackSection from "./about/TechStackSection";
 
 import BlogEditorToolBar from "./blog/edit/blogEditToolBar";
 import BlogItem from "./blog/(list)/blogItem";
@@ -23,6 +27,10 @@ export {
   // About
   SectionBox,
   SubBox,
+  LoginPrompt,
+  InfoRow,
+  RecordItem,
+  TechStackSection,
   // Blog
   BlogEditorToolBar,
   BlogItem,
