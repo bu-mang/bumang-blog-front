@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/drawer";
 import { LuPlaneTakeoff as PublishPlaneIcon } from "react-icons/lu";
 import { getButtonColorStyle } from "@/utils/styles/filButtonManager";
-import { Tag } from "../../../../common/tag";
-import { ButtonBase } from "../../../../common/button";
+import { Tag, ReadPermissionSelector } from "../../../../common";
 import { RoleType } from "@/types";
 import { cn } from "@/utils/cn";
 import { toast } from "react-toastify";
@@ -82,22 +81,6 @@ export function PublishDrawer() {
       setIsLoading(false);
     },
   });
-
-  const handleChangeReadPermission = (role: "admin" | "user" | null) => {
-    if (!user) return;
-    if (user?.role === "user") {
-      setReadPermission("user");
-      return;
-    }
-
-    setReadPermission(role);
-  };
-
-  useEffect(() => {
-    if (user?.role === "user") {
-      setReadPermission("user");
-    }
-  }, [user]);
 
   // 수정 모드일 때 기존 readPermission 값 로드
   useEffect(() => {
@@ -448,60 +431,11 @@ export function PublishDrawer() {
                 </div>
               </div>
 
-              <div>
-                <div className="mb-1 flex items-center gap-2 font-medium">
-                  {t("readPermission.label")}
-                  {user?.role === "user" && (
-                    <span className="text-xs text-gray-300">
-                      {t("readPermission.userOnly")}
-                    </span>
-                  )}
-                </div>
-                <div className="relative flex overflow-hidden rounded-lg border border-gray-50">
-                  <ButtonBase
-                    className={cn(
-                      "flex-1 py-2 transition-all active:scale-100",
-                      readPermission === null && "text-white",
-                      user?.role === "user" && "opacity-30",
-                    )}
-                    onClick={() => handleChangeReadPermission(null)}
-                  >
-                    {t("readPermission.types.public")}
-                  </ButtonBase>
-
-                  <ButtonBase
-                    className={cn(
-                      "flex-1 py-2 transition-all active:scale-100",
-                      readPermission === "user" && "text-white",
-                    )}
-                    onClick={() => handleChangeReadPermission("user")}
-                  >
-                    {t("readPermission.types.loggedInUser")}
-                  </ButtonBase>
-
-                  <ButtonBase
-                    className={cn(
-                      "flex-1 py-2 transition-all active:scale-100",
-                      readPermission === "admin" && "text-white",
-                      user?.role === "user" && "opacity-30",
-                    )}
-                    onClick={() => handleChangeReadPermission("admin")}
-                  >
-                    {t("readPermission.types.admin")}
-                  </ButtonBase>
-
-                  {/* BACKGROUND */}
-                  <div
-                    className={cn(
-                      "absolute -z-[1] flex h-full w-1/3 bg-gray-800 transition-all",
-                      readPermission === null && "translate-x-0",
-                      readPermission === "user" && "translate-x-full",
-                      readPermission === "admin" && "translate-x-[200%]",
-                      "will-change-transform",
-                    )}
-                  />
-                </div>
-              </div>
+              <ReadPermissionSelector
+                value={readPermission}
+                onChange={setReadPermission}
+                userRole={(user?.role as "admin" | "user") ?? null}
+              />
             </div>
           </div>
           <DrawerFooter>

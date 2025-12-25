@@ -9,6 +9,7 @@ import LabelWithUtil from "./labelWithUtil";
 import Editor from "./editor";
 
 import { Tag, CollapsedTag, TagWrapper } from "./tag";
+import ReadPermissionSelector from "./readPermissionSelector";
 
 export {
   /**
@@ -39,6 +40,10 @@ export {
    * @EDITOR
    */
   Editor,
+  /**
+   * @READ_PERMISSION
+   */
+  ReadPermissionSelector,
   /**
    * @ETC
    */
