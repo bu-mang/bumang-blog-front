@@ -11,15 +11,6 @@ export const END_POINTS = {
   // BLOG
   GET_GROUP_CATEGORY_MENU_TREE: "/categories/groups/menu",
   GET_ALL_TAGS: "/tags",
-  GET_ALL_POSTS_AUTHENTICATED: (
-    pageIndex: number,
-    pageSize: number,
-    groupId?: number,
-    categoryId?: number,
-    tagIds?: string | string[],
-    type?: string,
-  ) =>
-    `/posts/authenticated?pageIndex=${pageIndex}&pageSize=${pageSize}&groupId=${groupId ?? ""}&categoryId=${categoryId ?? ""}&type=${type ?? ""}&${typeof tagIds === "string" ? `tagIds=${tagIds}` : tagIds?.map((tag) => `tagIds=${tag}`).join("&")}`,
   GET_ALL_POSTS: (
     pageIndex: number,
     pageSize: number,

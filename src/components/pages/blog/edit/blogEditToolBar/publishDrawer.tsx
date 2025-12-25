@@ -55,6 +55,7 @@ export function PublishDrawer() {
   const [previewText, setPreviewText] = useState("");
 
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
 
   const params = useSearchParams();
@@ -64,15 +65,22 @@ export function PublishDrawer() {
   const postMutation = useMutation({
     mutationFn: postCreatePost,
     onSuccess: () => {
+      console.log("Post created successfully!");
+      toast.success("Post published successfully!");
+      setOpen(false); // Drawer 닫기
+      setIsLoading(false);
       setTimeout(() => {
         router.replace(PATHNAME.BLOG);
-      }, 500);
+      }, 300); // Drawer 애니메이션 후 redirect
     },
     onError: (error) => {
       if (!isAxiosError(error)) return;
 
-      console.log(error.response?.config.data, "error.response?.config.data");
-      console.log(error.message, "error.message");
+      const errorMessage =
+        error.response?.data?.message || "Failed to publish post";
+      toast.error(errorMessage);
+      console.error("Post creation error:", error.response?.config.data);
+      console.error("Error message:", error.message);
     },
   });
 
@@ -95,16 +103,23 @@ export function PublishDrawer() {
   const updateMutation = useMutation({
     mutationFn: ({ queryId, ...rest }: CreatePostDto & { queryId: string }) =>
       patchUpdatePost(queryId, rest),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      console.log("Post updated successfully!");
+      toast.success("Post updated successfully!");
+      setOpen(false); // Drawer 닫기
+      setIsLoading(false);
       setTimeout(() => {
-        router.replace(PATHNAME.BLOG + `/${queryId}`);
-      }, 500);
+        router.replace(PATHNAME.BLOG + `/${variables.queryId}`);
+      }, 300); // Drawer 애니메이션 후 redirect
     },
     onError: (error) => {
       if (!isAxiosError(error)) return;
 
-      console.log(error.response?.config.data, "error.response?.config.data");
-      console.log(error.message, "error.message");
+      const errorMessage =
+        error.response?.data?.message || "Failed to update post";
+      toast.error(errorMessage);
+      console.error("Post update error:", error.response?.config.data);
+      console.error("Error message:", error.message);
     },
   });
 
@@ -118,6 +133,7 @@ export function PublishDrawer() {
 
   // PUBLISH!!
   const handlePublish = async () => {
+    setIsLoading(true);
     // BlockNote content를 HTML로 변환
     const content = onSerialize();
     const serializedHTML = content ? JSON.stringify(content) : undefined;
@@ -221,6 +237,10 @@ export function PublishDrawer() {
       setPreviewText(getPreviewText().slice(0, 200));
     }
   }, [open, getImages, getPreviewText]);
+
+  // 로딩 상태 확인
+  const isActionLoading =
+    isLoading || postMutation.isPending || updateMutation.isPending;
 
   return (
     <Drawer
@@ -416,9 +436,17 @@ export function PublishDrawer() {
             </div>
           </div>
           <DrawerFooter>
-            <Button onClick={handlePublish}>{t("submit")}</Button>
+            <Button
+              onClick={handlePublish}
+              isLoading={isActionLoading}
+              loadingText={queryId ? "Updating..." : "Publishing..."}
+            >
+              {t("submit")}
+            </Button>
             <DrawerClose asChild>
-              <Button variant="outline">{t("cancel")}</Button>
+              <Button variant="outline" disabled={isActionLoading}>
+                {t("cancel")}
+              </Button>
             </DrawerClose>
           </DrawerFooter>
         </div>

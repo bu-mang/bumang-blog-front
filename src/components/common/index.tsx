@@ -5,7 +5,7 @@ import Pagenation from "./pageNation";
 
 import TagCombobox from "./tagComboBox";
 import Divider from "./divider";
-import SectionLabel from "./sectionLabel";
+import LabelWithUtil from "./labelWithUtil";
 import Editor from "./editor";
 
 import { Tag, CollapsedTag, TagWrapper } from "./tag";
@@ -34,7 +34,7 @@ export {
   /**
    * @SECTION_LABEL
    */
-  SectionLabel,
+  LabelWithUtil,
   /**
    * @EDITOR
    */

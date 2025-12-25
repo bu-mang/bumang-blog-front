@@ -9,6 +9,9 @@ interface BlogIndexProps {
   onStart: boolean;
 }
 
+/**
+ * @포스팅_옆_목차_컴포넌트
+ */
 const BlogIndex = ({ onStart }: BlogIndexProps) => {
   const [headings, setHeadings] = useState<BlogHeadingComponentType[]>([]);
   const [activeId, setActiveId] = useState<string>();

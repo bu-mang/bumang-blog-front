@@ -41,34 +41,7 @@ export const getAllPosts = async (
         tagIds,
         type,
       ),
-    {
-      next: {
-        revalidate: process.env.NODE_ENV === "development" ? 0 : 0,
-      },
-    },
   );
 
   return res;
-};
-
-export const getAllPostAuthenticated = async (
-  pageIndex: number,
-  pageSize: number,
-  groupId?: number,
-  categoryId?: number,
-  tagIds?: string | string[],
-  type?: string,
-) => {
-  const res = await ClientInstance.get<PaginatedResponseDto<PostListItemType>>(
-    END_POINTS.GET_ALL_POSTS_AUTHENTICATED(
-      pageIndex,
-      pageSize,
-      groupId,
-      categoryId,
-      tagIds,
-      type,
-    ),
-  );
-
-  return res.data;
 };

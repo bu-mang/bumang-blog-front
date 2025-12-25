@@ -1,6 +1,6 @@
 "use client";
 
-import { SectionLabel, Pagenation } from "@/components/common";
+import { Pagenation, LabelWithUtil } from "@/components/common";
 import { BlogItem } from "@/components/pages";
 
 import { PaginatedResponseDto, PostListItemType } from "@/types";
@@ -86,7 +86,8 @@ function BlogListView({
 
   return (
     <div className="col-span-full h-fit md:col-span-3">
-      <SectionLabel
+      {/*  */}
+      <LabelWithUtil
         isTag={typeof tagIds !== "undefined"}
         title={
           allPosts?.subject ||
@@ -96,6 +97,7 @@ function BlogListView({
         amount={allPosts?.totalCount ?? 0}
         itemViewType={itemViewType}
       />
+
       <div
         className={cn(
           "col-span-full",

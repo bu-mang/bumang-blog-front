@@ -8,7 +8,7 @@ import { useAuthStore } from "@/store/auth";
 import { useQueryParams } from "@/hooks/useQueryParams";
 import { useEditStore } from "@/store/edit";
 
-interface SectionLabelProps {
+interface LabelWithUtilProps {
   title: string;
   itemViewType: "list" | "thumbnail";
   amount?: number;
@@ -17,14 +17,14 @@ interface SectionLabelProps {
   className?: string;
 }
 
-const SectionLabel = ({
+const LabelWithUtil = ({
   title = "All",
   itemViewType,
   amount,
   isTag,
   isDraggable = false,
   className,
-}: SectionLabelProps) => {
+}: LabelWithUtilProps) => {
   const { textStyle, fillStyle, flexBoxClass } = getButtonColorStyle("dark");
   const titleClass = cn(
     "col-span-3 mb-5 flex h-10 w-full items-center justify-between font-semibold",
@@ -94,4 +94,4 @@ const SectionLabel = ({
   );
 };
 
-export default SectionLabel;
+export default LabelWithUtil;
