@@ -64,16 +64,6 @@ export function PublishDrawer() {
   const router = useRouter();
   const postMutation = useMutation({
     mutationFn: postCreatePost,
-    onSuccess: () => {
-      console.log("Post created successfully!");
-      toast.success("Post published successfully!");
-      setIsLoading(false);
-      setOpen(false); // Drawer 닫기
-      setTimeout(() => {
-        console.log("Redirecting to:", PATHNAME.BLOG);
-        router.push(PATHNAME.BLOG);
-      }, 500); // Drawer 애니메이션 완료 대기
-    },
     onError: (error) => {
       if (!isAxiosError(error)) return;
 
@@ -82,6 +72,7 @@ export function PublishDrawer() {
       toast.error(errorMessage);
       console.error("Post creation error:", error.response?.config.data);
       console.error("Error message:", error.message);
+      setIsLoading(false);
     },
   });
 
@@ -104,17 +95,6 @@ export function PublishDrawer() {
   const updateMutation = useMutation({
     mutationFn: ({ queryId, ...rest }: CreatePostDto & { queryId: string }) =>
       patchUpdatePost(queryId, rest),
-    onSuccess: (_data, variables) => {
-      console.log("Post updated successfully!");
-      toast.success("Post updated successfully!");
-      setIsLoading(false);
-      setOpen(false); // Drawer 닫기
-      setTimeout(() => {
-        const targetUrl = PATHNAME.BLOG + `/${variables.queryId}`;
-        console.log("Redirecting to:", targetUrl);
-        router.push(targetUrl);
-      }, 500); // Drawer 애니메이션 완료 대기
-    },
     onError: (error) => {
       if (!isAxiosError(error)) return;
 
@@ -123,6 +103,7 @@ export function PublishDrawer() {
       toast.error(errorMessage);
       console.error("Post update error:", error.response?.config.data);
       console.error("Error message:", error.message);
+      setIsLoading(false);
     },
   });
 
@@ -170,10 +151,36 @@ export function PublishDrawer() {
 
     onDisablePrevent();
 
-    // 수정인 경우
-    if (queryId) {
-      updateMutation.mutate({
-        queryId,
+    try {
+      // 수정인 경우
+      if (queryId) {
+        await updateMutation.mutateAsync({
+          queryId,
+          title,
+          content: serializedHTML,
+          previewText,
+          categoryId,
+          tagIds,
+          readPermission,
+          thumbnailUrl,
+        });
+
+        // 성공 후 처리
+        console.log("Post updated successfully!");
+        toast.success("Post updated successfully!");
+        setIsLoading(false);
+        setOpen(false);
+
+        // Drawer 애니메이션 완료 대기 후 redirect
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const targetUrl = PATHNAME.BLOG + `/${queryId}`;
+        console.log("Redirecting to:", targetUrl);
+        router.push(targetUrl);
+        return;
+      }
+
+      // 생성인 경우
+      await postMutation.mutateAsync({
         title,
         content: serializedHTML,
         previewText,
@@ -182,18 +189,21 @@ export function PublishDrawer() {
         readPermission,
         thumbnailUrl,
       });
-      return;
-    }
 
-    postMutation.mutate({
-      title,
-      content: serializedHTML,
-      previewText,
-      categoryId,
-      tagIds,
-      readPermission,
-      thumbnailUrl,
-    });
+      // 성공 후 처리
+      console.log("Post created successfully!");
+      toast.success("Post published successfully!");
+      setIsLoading(false);
+      setOpen(false);
+
+      // Drawer 애니메이션 완료 대기 후 redirect
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log("Redirecting to:", PATHNAME.BLOG);
+      router.push(PATHNAME.BLOG);
+    } catch (error) {
+      // onError 콜백에서 처리되므로 여기서는 로그만
+      console.error("Mutation failed:", error);
+    }
   };
 
   // BlockNote에서 이미지와 텍스트 추출
