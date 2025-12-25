@@ -11,7 +11,6 @@ import { PostDetailResponseDto } from "@/types/dto/blog/[id]";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
-import { PartialBlock } from "@blocknote/core";
 import { format } from "date-fns";
 import {
   AlignJustifyIcon,
@@ -41,6 +40,8 @@ import {
   parseBlockNoteContent,
   parseYooptaContent,
 } from "@/utils/contentFormat";
+import useModalStore from "@/store/modal";
+import CommonModal from "@/components/modal/type/common";
 
 interface BlogDetailInnerProps {
   post: PostDetailResponseDto;
@@ -212,14 +213,27 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
         selectedGroup: post.group,
         selectedCategory: post.category,
         selectedTags: post.tags,
+        readPermission: post.readPermission,
       },
       "toUpdate",
     );
   };
 
-  const handleDelete = () => {
-    // 정말 삭제하시겠습니까?
-    deleteMutation.mutateAsync();
+  const openModal = useModalStore((state) => state.openModal);
+
+  const handleDelete = async () => {
+    const confirmed = await openModal(CommonModal, {
+      title: t("deleteConfirmTitle") || "포스트 삭제",
+      desc:
+        t("deleteConfirmDesc") ||
+        "정말 삭제하시겠습니까?\n삭제된 포스트는 복구할 수 없습니다.",
+      proceedLabel: t("deleteConfirmButton") || "삭제",
+      dismissLabel: t("cancel") || "취소",
+    });
+
+    if (confirmed) {
+      deleteMutation.mutateAsync();
+    }
   };
 
   const router = useRouter();

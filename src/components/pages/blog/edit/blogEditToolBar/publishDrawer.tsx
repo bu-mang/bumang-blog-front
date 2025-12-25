@@ -24,6 +24,7 @@ import { PATHNAME } from "@/constants/routes/pathnameRoutes";
 import { postCreatePost, patchUpdatePost } from "@/services/api/blog/edit";
 import { isAxiosError } from "axios";
 import { useAuthStore } from "@/store/auth";
+import { useEditStore } from "@/store/edit";
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { getThumbnailByGroup } from "@/utils/getThumnailByGroup";
@@ -50,16 +51,22 @@ export function PublishDrawer() {
     getButtonColorStyle("dark");
 
   const user = useAuthStore((state) => state.user);
-  const [readPermission, setReadPermission] = useState<RoleType>(null);
+  const editDraft = useEditStore((state) => state.editDraft);
+
+  const params = useSearchParams();
+  const queryId = params.get("id");
+
+  const [readPermission, setReadPermission] = useState<RoleType>(
+    queryId && editDraft?.readPermission !== undefined
+      ? editDraft.readPermission
+      : null
+  );
   const [thumbnails, setThumbnails] = useState<string[]>([]);
   const [previewText, setPreviewText] = useState("");
 
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
-
-  const params = useSearchParams();
-  const queryId = params.get("id");
 
   const router = useRouter();
   const postMutation = useMutation({
@@ -92,6 +99,13 @@ export function PublishDrawer() {
     }
   }, [user]);
 
+  // 수정 모드일 때 기존 readPermission 값 로드
+  useEffect(() => {
+    if (queryId && editDraft?.readPermission !== undefined) {
+      setReadPermission(editDraft.readPermission);
+    }
+  }, [queryId, editDraft]);
+
   const updateMutation = useMutation({
     mutationFn: ({ queryId, ...rest }: CreatePostDto & { queryId: string }) =>
       patchUpdatePost(queryId, rest),
@@ -115,15 +129,57 @@ export function PublishDrawer() {
     );
   };
 
+  // BlockNote content의 앞뒤 빈 블록 제거
+  const trimBlockNoteContent = (blocks: any) => {
+    if (!blocks || blocks.length === 0) return blocks;
+
+    let start = 0;
+    let end = blocks.length - 1;
+
+    // 앞에서부터 빈 블록 찾기
+    while (start < blocks.length && isEmptyBlock(blocks[start])) {
+      start++;
+    }
+
+    // 뒤에서부터 빈 블록 찾기
+    while (end >= 0 && isEmptyBlock(blocks[end])) {
+      end--;
+    }
+
+    if (start > end) return []; // 모든 블록이 빈 경우
+
+    return blocks.slice(start, end + 1);
+  };
+
+  const isEmptyBlock = (block: any): boolean => {
+    if (block.type === "paragraph") {
+      const content = block.content;
+      if (!content || content.length === 0) return true;
+      if (Array.isArray(content)) {
+        return content.every(
+          (item: any) => !item.text || item.text.trim() === "",
+        );
+      }
+    }
+    return false;
+  };
+
   // PUBLISH!!
   const handlePublish = async () => {
     setIsLoading(true);
     // BlockNote content를 HTML로 변환
     const content = onSerialize();
-    const serializedHTML = content ? JSON.stringify(content) : undefined;
+    const trimmedContent = trimBlockNoteContent(content);
+    const serializedHTML = trimmedContent
+      ? JSON.stringify(trimmedContent)
+      : undefined;
     const categoryId = selectedCategory?.id;
     const tagIds = selectedTags.map((item) => item.id);
     const thumbnailUrl = thumbnails[thumbnailIndex];
+
+    // 전후 공백 제거
+    const trimmedTitle = title.trim();
+    const trimmedPreviewText = previewText.trim();
 
     // 로그인을 안 했을 때
     if (!user?.role) {
@@ -138,13 +194,13 @@ export function PublishDrawer() {
     }
 
     // 타이틀 미입력 시
-    if (!title) {
+    if (!trimmedTitle) {
       toast.error("Write Some Title, Me!");
       return;
     }
 
     // 본문 미입력 시
-    if (!serializedHTML || !previewText) {
+    if (!serializedHTML || !trimmedPreviewText) {
       toast.error("Write Some Contents, Me!");
       return;
     }
@@ -156,9 +212,9 @@ export function PublishDrawer() {
       if (queryId) {
         await updateMutation.mutateAsync({
           queryId,
-          title,
+          title: trimmedTitle,
           content: serializedHTML,
-          previewText,
+          previewText: trimmedPreviewText,
           categoryId,
           tagIds,
           readPermission,
@@ -181,9 +237,9 @@ export function PublishDrawer() {
 
       // 생성인 경우
       await postMutation.mutateAsync({
-        title,
+        title: trimmedTitle,
         content: serializedHTML,
-        previewText,
+        previewText: trimmedPreviewText,
         categoryId,
         tagIds,
         readPermission,

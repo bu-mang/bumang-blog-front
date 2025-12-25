@@ -7,8 +7,8 @@ import TechStackSection from "./about/TechStackSection";
 import BlogEditorToolBar from "./blog/edit/blogEditToolBar";
 import BlogItem from "./blog/(list)/blogItem";
 import BlogIndex from "./blog/(list)/blogIndex";
-import DraftController from "./blog/edit/draftController";
 import BlogComment from "./blog/[id]/blogInnerView/blogComment";
+import DraftController from "./blog/edit/blogEditToolBar/draftController";
 
 import PlayItem from "./play/playItem";
 
