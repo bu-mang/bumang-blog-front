@@ -13,8 +13,8 @@ import {
   FillButton,
 } from "@/components/common";
 import { useRouter } from "@/i18n/navigation";
-import { TagType, GroupType, CategoryType } from "@/types";
-import DraftController from "../draftController";
+import { GroupType, CategoryType } from "@/types";
+import DraftController from "../blogEditToolBar/draftController";
 import { PublishDrawer } from "@/components/pages/blog/edit/blogEditToolBar/publishDrawer";
 import { useTranslations } from "next-intl";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";

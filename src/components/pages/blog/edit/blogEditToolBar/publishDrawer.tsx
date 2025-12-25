@@ -67,11 +67,12 @@ export function PublishDrawer() {
     onSuccess: () => {
       console.log("Post created successfully!");
       toast.success("Post published successfully!");
-      setOpen(false); // Drawer 닫기
       setIsLoading(false);
+      setOpen(false); // Drawer 닫기
       setTimeout(() => {
-        router.replace(PATHNAME.BLOG);
-      }, 300); // Drawer 애니메이션 후 redirect
+        console.log("Redirecting to:", PATHNAME.BLOG);
+        router.push(PATHNAME.BLOG);
+      }, 500); // Drawer 애니메이션 완료 대기
     },
     onError: (error) => {
       if (!isAxiosError(error)) return;
@@ -106,11 +107,13 @@ export function PublishDrawer() {
     onSuccess: (_data, variables) => {
       console.log("Post updated successfully!");
       toast.success("Post updated successfully!");
-      setOpen(false); // Drawer 닫기
       setIsLoading(false);
+      setOpen(false); // Drawer 닫기
       setTimeout(() => {
-        router.replace(PATHNAME.BLOG + `/${variables.queryId}`);
-      }, 300); // Drawer 애니메이션 후 redirect
+        const targetUrl = PATHNAME.BLOG + `/${variables.queryId}`;
+        console.log("Redirecting to:", targetUrl);
+        router.push(targetUrl);
+      }, 500); // Drawer 애니메이션 완료 대기
     },
     onError: (error) => {
       if (!isAxiosError(error)) return;
