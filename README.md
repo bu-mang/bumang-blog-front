@@ -17,7 +17,7 @@ Bumang Route53은 프론트엔드 개발자의 포트폴리오와 기술 블로�
 - 카테고리 및 태그 기반 글 분류 시스템
 - 페이지네이션이 적용된 글 목록 (리스트/썸네일 뷰)
 - 공개/비공개 글 관리
-- Yoopta Editor를 활용한 풍부한 마크다운 편집 기능
+- BlockNote Editor를 활용한 풍부한 마크다운 편집 기능
 - 댓글 시스템 (Utterances)
 
 ### 포트폴리오
@@ -59,7 +59,7 @@ Bumang Route53은 프론트엔드 개발자의 포트폴리오와 기술 블로�
 
 ### Content Editor
 
-- **Yoopta Editor**: 블로그 글 작성용 에디터
+- **BlockNote Editor**: 블로그 글 작성용 에디터
   - Accordion, Blockquote, Callout, Code
   - Image, Video, File Upload
   - Table, Embed, Link
@@ -228,7 +228,7 @@ npm run deploy
 
 ### 3. 커스텀 에디터 통합
 
-Yoopta Editor를 활용하여 블록 기반의 풍부한 텍스트 편집 기능을 제공합니다.
+BlockNote Editor를 활용하여 블록 기반의 풍부한 텍스트 편집 기능을 제공합니다.
 
 ### 4. 서버/클라이언트 컴포넌트 분리
 

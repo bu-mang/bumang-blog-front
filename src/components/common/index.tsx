@@ -6,7 +6,6 @@ import Pagenation from "./pageNation";
 import TagCombobox from "./tagComboBox";
 import Divider from "./divider";
 import LabelWithUtil from "./labelWithUtil";
-import Editor from "./editor";
 
 import { Tag, CollapsedTag, TagWrapper } from "./tag";
 import ReadPermissionSelector from "./readPermissionSelector";
@@ -36,10 +35,6 @@ export {
    * @SECTION_LABEL
    */
   LabelWithUtil,
-  /**
-   * @EDITOR
-   */
-  Editor,
   /**
    * @READ_PERMISSION
    */

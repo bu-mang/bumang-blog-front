@@ -35,11 +35,7 @@ import { useMutation } from "@tanstack/react-query";
 import { deletePost } from "@/services/api/blog/edit";
 import { useTranslations } from "next-intl";
 import { useHeaderStore } from "@/store/header";
-import {
-  detectContentFormat,
-  parseBlockNoteContent,
-  parseYooptaContent,
-} from "@/utils/contentFormat";
+import { parseBlockNoteContent } from "@/utils/contentFormat";
 import useModalStore from "@/store/modal";
 import CommonModal from "@/components/modal/type/common";
 
@@ -51,7 +47,11 @@ interface BlogDetailInnerProps {
  * @BLOG_INNER_VIEW
  */
 
-export function BlogInnerViewFallback({ isError }: { isError?: boolean }) {
+export function BlogDetailInnerViewFallback({
+  isError,
+}: {
+  isError?: boolean;
+}) {
   const router = useRouter();
 
   if (isError) {
@@ -145,7 +145,7 @@ export function BlogInnerViewFallback({ isError }: { isError?: boolean }) {
   );
 }
 
-export default function BlogInnerView({ post }: BlogDetailInnerProps) {
+export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
   const t = useTranslations("blogDetail");
 
   // 헤더 상태 초기화
@@ -162,54 +162,29 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
   const user = useAuthStore((state) => state.user);
   const setAllEditState = useEditStore((state) => state.setAllEditState);
 
-  // Detect content format
-  const contentFormat = useMemo(() => {
-    return detectContentFormat(post.content);
-  }, [post.content]);
-
   // Parse BlockNote content
   const blockNoteContent = useMemo(() => {
-    if (contentFormat !== "blocknote") return undefined;
     return parseBlockNoteContent(post.content);
-  }, [contentFormat, post.content]);
+  }, [post.content]);
 
-  // Parse Yoopta HTML content
-  const yooptaHTML = useMemo(() => {
-    if (contentFormat !== "yoopta") return "";
-    return parseYooptaContent(post.content);
-  }, [contentFormat, post.content]);
-
-  // Only create BlockNote editor if format is blocknote
-  const editor = useCreateBlockNote(
-    blockNoteContent
-      ? {
-          initialContent: blockNoteContent,
-        }
-      : undefined,
-  );
+  // Create BlockNote editor
+  const editor = useCreateBlockNote({
+    initialContent: blockNoteContent,
+  });
 
   // 파싱 완료 표시
   useEffect(() => {
-    if (
-      contentFormat === "blocknote" &&
-      blockNoteContent &&
-      blockNoteContent.length > 0
-    ) {
-      setIndexParsed(true);
-    } else if (contentFormat === "yoopta" && yooptaHTML) {
+    if (blockNoteContent && blockNoteContent.length > 0) {
       setIndexParsed(true);
     }
-  }, [contentFormat, blockNoteContent, yooptaHTML]);
+  }, [blockNoteContent]);
 
   const handleSetDraft = () => {
-    const draftContent =
-      contentFormat === "blocknote" ? blockNoteContent : undefined;
-
     setAllEditState(
       post.id,
       {
         title: post.title,
-        content: draftContent,
+        content: blockNoteContent,
         selectedGroup: post.group,
         selectedCategory: post.category,
         selectedTags: post.tags,
@@ -338,22 +313,7 @@ export default function BlogInnerView({ post }: BlogDetailInnerProps) {
           )}
         </div>
 
-        {contentFormat === "blocknote" && (
-          <BlockNoteView editor={editor} theme="light" editable={false} />
-        )}
-
-        {contentFormat === "yoopta" && (
-          <div
-            className="yoopta-content prose prose-lg max-w-none dark:prose-invert"
-            dangerouslySetInnerHTML={{ __html: yooptaHTML }}
-          />
-        )}
-
-        {contentFormat === "unknown" && (
-          <div className="py-8 text-center text-gray-400">
-            Unable to render content (unknown format)
-          </div>
-        )}
+        <BlockNoteView editor={editor} theme="light" editable={false} />
       </div>
 
       {/* 목차 */}

@@ -1,12 +1,11 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { PartialBlock } from "@blocknote/core";
-import { YooptaContentValue } from "@yoopta/editor";
 import { RoleType } from "@/types/user";
 
 interface EditDraftType {
   title: string;
-  content: YooptaContentValue | string | PartialBlock[] | undefined;
+  content: PartialBlock[] | undefined;
   selectedGroup: { id: number; label: string } | null;
   selectedCategory: { id: number; label: string } | null;
   selectedTags: { id: number; label: string }[];

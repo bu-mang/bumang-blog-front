@@ -1,6 +1,6 @@
-import BlogDetailPublic, {
-  BlogInnerViewFallback,
-} from "@/components/pages/blog/[id]/blogInnerView";
+import BlogDetailInner, {
+  BlogDetailInnerViewFallback,
+} from "@/components/pages/blog/[id]/blogDetailInnerView";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
 import { getBlogDetail } from "@/services/api/blog/[id].server";
 import { PostDetailResponseDto } from "@/types/dto/blog/[id]";
@@ -128,9 +128,9 @@ export default async function BlogDetail({ params }: BlogDetailPageProps) {
   }
 
   if (!post) {
-    return <BlogInnerViewFallback />;
+    return <BlogDetailInnerViewFallback />;
   }
 
   // SSR로 불러온 POST DATA가 있으면 SSR, 없으면 CSR
-  return <BlogDetailPublic post={post} />;
+  return <BlogDetailInner post={post} />;
 }
