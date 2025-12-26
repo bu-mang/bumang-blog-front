@@ -10,6 +10,7 @@ export const useCheckPermission = (readPermission: RoleType) => {
     guest: 0,
     user: 1,
     admin: 2,
+    owner: 3,
   };
 
   return (

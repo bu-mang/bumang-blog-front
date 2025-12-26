@@ -20,6 +20,7 @@ export interface PostListItemType {
   groupLabel: string;
   tags: TagCompactType[];
   author: string;
+  authorRole: RoleType | null;
   thumbnailUrl: string | null;
   readPermisson: RoleType;
   score?: number;

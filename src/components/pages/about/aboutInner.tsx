@@ -15,9 +15,7 @@ import { useHeaderStore } from "@/store/header";
 import LoginPrompt from "./LoginPrompt";
 import InfoRow from "./InfoRow";
 import RecordItem from "./RecordItem";
-import TechStackSection, {
-  type TechStackItemData,
-} from "./TechStackSection";
+import TechStackSection, { type TechStackItemData } from "./TechStackSection";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,47 +42,53 @@ const techStackSections: Array<{
     category: "Web Frontend",
     className: "border-none",
     items: [
-      { title: "React/Next.js", descriptionKey: "techStack.webFrontEnd.1.desc" },
       {
-        title: "Tailwind, StyledComponent",
+        title: "techStack.webFrontEnd.1.title",
+        descriptionKey: "techStack.webFrontEnd.1.desc",
+      },
+      {
+        title: "techStack.webFrontEnd.2.title",
         descriptionKey: "techStack.webFrontEnd.2.desc",
       },
       {
-        title: "React-Hook-Form, Zod",
+        title: "techStack.webFrontEnd.3.title",
         descriptionKey: "techStack.webFrontEnd.3.desc",
       },
       {
-        title: "Axios, TanstackQuery",
+        title: "techStack.webFrontEnd.4.title",
         descriptionKey: "techStack.webFrontEnd.4.desc",
       },
       {
-        title: "Zustand, ReduxToolkit",
+        title: "techStack.webFrontEnd.5.title",
         descriptionKey: "techStack.webFrontEnd.5.desc",
       },
       {
-        title: "Gsap, Three.js, Motion",
+        title: "techStack.webFrontEnd.6.title",
         descriptionKey: "techStack.webFrontEnd.6.desc",
       },
     ],
   },
   {
-    category: "Mobile Frontend",
+    category: "App Frontend",
     items: [
       {
-        title: "React Native",
+        title: "techStack.appFrontEnd.1.title",
         descriptionKey: "techStack.appFrontEnd.1.desc",
       },
-      { title: "StyleSheet", descriptionKey: "techStack.appFrontEnd.2.desc" },
       {
-        title: "React Native Codepush",
+        title: "techStack.appFrontEnd.2.title",
+        descriptionKey: "techStack.appFrontEnd.2.desc",
+      },
+      {
+        title: "techStack.appFrontEnd.3.title",
         descriptionKey: "techStack.appFrontEnd.3.desc",
       },
       {
-        title: "React Native Firebase FCM",
+        title: "techStack.appFrontEnd.4.title",
         descriptionKey: "techStack.appFrontEnd.4.desc",
       },
       {
-        title: "React Native Reanimated",
+        title: "techStack.appFrontEnd.5.title",
         descriptionKey: "techStack.appFrontEnd.5.desc",
       },
     ],
@@ -92,20 +96,47 @@ const techStackSections: Array<{
   {
     category: "Backend",
     items: [
-      { title: "techStack.backend.1.title", descriptionKey: "techStack.backend.1.desc" },
-      { title: "techStack.backend.2.title", descriptionKey: "techStack.backend.2.desc" },
-      { title: "techStack.backend.3.title", descriptionKey: "techStack.backend.3.desc" },
-      { title: "techStack.backend.4.title", descriptionKey: "techStack.backend.4.desc" },
-      { title: "techStack.backend.5.title", descriptionKey: "techStack.backend.5.desc" },
-      { title: "techStack.backend.6.title", descriptionKey: "techStack.backend.6.desc" },
+      {
+        title: "techStack.backend.1.title",
+        descriptionKey: "techStack.backend.1.desc",
+      },
+      {
+        title: "techStack.backend.2.title",
+        descriptionKey: "techStack.backend.2.desc",
+      },
+      {
+        title: "techStack.backend.3.title",
+        descriptionKey: "techStack.backend.3.desc",
+      },
+      {
+        title: "techStack.backend.4.title",
+        descriptionKey: "techStack.backend.4.desc",
+      },
+      {
+        title: "techStack.backend.5.title",
+        descriptionKey: "techStack.backend.5.desc",
+      },
+      {
+        title: "techStack.backend.6.title",
+        descriptionKey: "techStack.backend.6.desc",
+      },
     ],
   },
   {
     category: "CI/CD",
     items: [
-      { title: "techStack.cicd.1.title", descriptionKey: "techStack.cicd.1.desc" },
-      { title: "techStack.cicd.2.title", descriptionKey: "techStack.cicd.2.desc" },
-      { title: "techStack.cicd.3.title", descriptionKey: "techStack.cicd.3.desc" },
+      {
+        title: "techStack.cicd.1.title",
+        descriptionKey: "techStack.cicd.1.desc",
+      },
+      {
+        title: "techStack.cicd.2.title",
+        descriptionKey: "techStack.cicd.2.desc",
+      },
+      {
+        title: "techStack.cicd.3.title",
+        descriptionKey: "techStack.cicd.3.desc",
+      },
     ],
   },
   {
@@ -156,14 +187,18 @@ const basicLevelSections: Array<{
         title: "techStack.basicLevel.3.title",
         descriptionKey: "techStack.basicLevel.3.desc",
       },
+      {
+        title: "techStack.basicLevel.4.title",
+        descriptionKey: "techStack.basicLevel.4.desc",
+      },
     ],
   },
   {
     category: "Design",
     items: [
       {
-        title: "techStack.basicLevel.4.title",
-        descriptionKey: "techStack.basicLevel.4.desc",
+        title: "techStack.basicLevel.5.title",
+        descriptionKey: "techStack.basicLevel.5.desc",
       },
     ],
   },
@@ -240,7 +275,11 @@ export default function AboutInner({
           <InfoRow
             label="Moblie"
             value={
-              isAuthenticated ? "+82 10-4922-3563" : <LoginPrompt locale={locale} />
+              isAuthenticated ? (
+                "+82 10-4922-3563"
+              ) : (
+                <LoginPrompt locale={locale} />
+              )
             }
           />
 

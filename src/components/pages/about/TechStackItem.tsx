@@ -23,7 +23,7 @@ export default function TechStackItem({
 
   return (
     <div className={cn("flex flex-col", positionClass)}>
-      <span className="font-semibold">{title}</span>
+      <span className="font-semibold">{useTranslation ? t(title) : title}</span>
       <span className="text-gray-300">
         {useTranslation ? t(description) : description}
       </span>

@@ -463,7 +463,8 @@
         "types": {
           "public": "Public",
           "loggedInUser": "Logged-In User",
-          "admin": "Admin Only"
+          "admin": "Admin Only",
+          "owner": "Private"
         },
         "userOnly": "A user can only create read-only posts."
       },

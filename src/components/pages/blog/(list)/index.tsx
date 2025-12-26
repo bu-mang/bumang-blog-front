@@ -84,6 +84,10 @@ function BlogListView({
 }: BlogListViewProps) {
   const t = useTranslations("blog");
 
+  // 서버 응답값 확인
+  console.log("📦 allPosts 서버 응답:", allPosts);
+  console.log("📝 allPosts.data:", allPosts?.data);
+
   return (
     <div className="col-span-full h-fit md:col-span-3">
       {/*  */}
@@ -103,7 +107,7 @@ function BlogListView({
           "col-span-full",
           itemViewType === "thumbnail" &&
             allPosts &&
-            "grid grid-cols-2 gap-x-[1.5vw] gap-y-[4vw] md:grid-cols-3",
+            "grid grid-cols-2 gap-x-[1.5vw] gap-y-[2.5vw] md:grid-cols-3",
         )}
       >
         {/* BLOGITEMS */}
@@ -119,6 +123,7 @@ function BlogListView({
                 groupLabel,
                 tags,
                 author,
+                authorRole,
                 thumbnailUrl,
                 readPermisson,
                 score,
@@ -132,6 +137,7 @@ function BlogListView({
                 title={title}
                 previewText={previewText}
                 author={author}
+                authorRole={authorRole}
                 // category & group
                 groupLabel={groupLabel}
                 categoryLabel={categoryLabel}
@@ -140,6 +146,7 @@ function BlogListView({
                 thumbnailUrl={thumbnailUrl}
                 readPermisson={readPermisson}
                 itemViewType={itemViewType}
+                isLastItem={index === allPosts?.data?.length - 1}
               />
             ),
           )
@@ -156,7 +163,7 @@ function BlogListView({
         )}
 
         {/* PAGE-NATION */}
-        <div className="col-span-full scale-75 md:col-span-3 md:scale-100">
+        <div className="col-span-full mt-5 scale-75 md:col-span-3 md:scale-100">
           <Pagenation
             pageSize={allPosts?.pageSize ?? 12}
             totalCount={allPosts?.totalCount ?? 1}

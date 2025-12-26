@@ -33,13 +33,12 @@ export default function TechStackSection({
 
       {items.map((item, index) => {
         const position = index % 2 === 0 ? "left" : "right";
-        const title = useTranslationForTitle ? t(item.title) : item.title;
         const description = item.descriptionKey || item.description || "";
 
         return (
           <TechStackItem
             key={`${item.title}-${index}`}
-            title={title}
+            title={item.title}
             description={description}
             position={position}
             useTranslation={useTranslationForDesc}

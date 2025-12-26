@@ -2,12 +2,16 @@
   "about": {
     "intro": {
       "title": {
-        "1": "Bumang!",
-        "2": "The Creative Developer"
+        "1": "Bumang,",
+        "2": "The Product Developer"
       },
-      "desc": "안녕하세요. Creative Developer, 버망입니다. 저는 학부 때는 산업디자인을 전공했고, UX/UI 디자이너로 커리어를 시작하여, 현재는 프론트엔드 개발자로 일하고 있습니다. 디지털 제품 경험의 A부터 Z까지 섬세하게 깎는 과정에서 재미를 느끼다보니 이런 커리어 패스를 밟아왔네요. 이 모든 과정에 모두 관여하고 싶은 니즈로 인해 풀스택 개발자로 성장해가고 있습니다. 그러나 저는 여전히 예술에 많은 관심이 있습니다. 특히 그림을 그리거나 멋진 그래픽을 만드는 것을 즐기죠. 현재는 인터랙티브한 2D/3D 콘텐츠를 만드는 것에 관심이 많으며, 개인 개발 프로젝트를 진행하며 새로운 기술을 실험해보는 것을 즐깁니다. 흥미로운 사이드 프로젝트 아이디어는 언제나 환영이니 맘껏 알려주세요!"
+      "desc": "안녕하세요. 프로덕트 개발자 Bumang입니다. 저는 학부 때 산업디자인을 전공했고, UX디자이너로 첫 커리어를 시작했다가 프론트엔드 개발자로 전향 후, 현재 회사에서 백엔드까지 업무를 확장해 풀스택 개발을 맡고 있습니다.. 저도 어쩌다가 이런 머나먼 커리어 여정을 밟아왔는지 당췌 모르겠습니다. 그래도 적어도 확실한 건 오타쿠 습성이 있어서 앉아서 몇시간이고 무언갈 중독적으로 파는 일을 좋아하고, 편해하고, 결국엔 잘해내는 성향인 것은 확실합니다. 최종적으로는 1인 개발로 먹고사는 것이 제 꿈입니다."
     },
     "record": {
+      "2025": {
+        "title": "BlockS",
+        "desc": "풀스택 개발자 근무"
+      },
       "2024": {
         "title": "BlockS",
         "desc": "프론트엔드 개발자 근무"
@@ -36,7 +40,7 @@
           "desc": "SPA 라이브러리/프레임워크"
         },
         "2": {
-          "title": "Tailwind, StyledComponents",
+          "title": "Tailwind",
           "desc": "스타일링"
         },
         "3": {
@@ -48,7 +52,7 @@
           "desc": "서버 호출 캐싱"
         },
         "5": {
-          "title": "Zustand, ReduxToolkit",
+          "title": "Zustand",
           "desc": "전역 상태 관리"
         },
         "6": {
@@ -58,24 +62,24 @@
       },
       "appFrontEnd": {
         "1": {
-          "title": "React Native",
-          "desc": "크로스플랫폼 프레임워크"
+          "title": "React Native CLI",
+          "desc": "Bare 리액트네이티브 개발"
         },
         "2": {
-          "title": "StyleSheet",
-          "desc": "스타일링"
+          "title": "React Native Reanimated",
+          "desc": "인터랙티브/애니메이션"
         },
         "3": {
           "title": "React Native Codepush",
-          "desc": "핫픽스 업데이트"
+          "desc": "OTA 업데이트"
         },
         "4": {
           "title": "React Native Firebase FCM",
-          "desc": "푸시 알림"
+          "desc": "앱 푸시 알림"
         },
         "5": {
-          "title": "React Native Reanimated",
-          "desc": "인터랙티브/애니메이션"
+          "title": "React Native Paper",
+          "desc": "인터랙션 컴포넌트"
         }
       },
       "backend": {
@@ -92,16 +96,16 @@
           "desc": "데이터베이스"
         },
         "4": {
-          "title": "TypeORM",
+          "title": "TypeORM, Mongoose",
           "desc": "ORM"
         },
         "5": {
-          "title": "AWS EC2",
-          "desc": "가상 클라우드 서버"
+          "title": "AWS EC2/S3",
+          "desc": "가상 클라우드 서버, 파일 저장소"
         },
         "6": {
-          "title": "AWS S3",
-          "desc": "가상 파일 저장소"
+          "title": "RabbitMQ",
+          "desc": "메시지큐"
         }
       },
       "cicd": {
@@ -154,6 +158,10 @@
           "desc": "인터랙티브 개발"
         },
         "4": {
+          "title": "AWS EKS",
+          "desc": "클러스터 컨테이너 환경"
+        },
+        "5": {
           "title": "Blender, Cinema4D",
           "desc": "3D 모델링 & 모션그래픽"
         }
@@ -462,7 +470,8 @@
         "types": {
           "public": "전체 공개",
           "loggedInUser": "로그인유저만",
-          "admin": "관리자만"
+          "admin": "관리자만",
+          "owner": "주인만"
         },
         "userOnly": "유저는 유저 공개글만 게시할 수 있습니다."
       },

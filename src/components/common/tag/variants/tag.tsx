@@ -1,10 +1,10 @@
 "use client";
 
 import { useQueryParams } from "@/hooks/useQueryParams";
-import { TagType } from "@/types";
-import clsx from "clsx";
+
 import { Link } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
+import { cn } from "@/utils/cn";
 import React from "react";
 import { LuX as CloseIcon } from "react-icons/lu";
 
@@ -50,12 +50,12 @@ const Tag = ({
     onClick();
   };
 
-  const tagClass = clsx(
+  const tagClass = cn(
     "flex gap-2 items-center h-fit bg-gray-1 dark:bg-gray-700 text-gray-200 transition-all truncate shadow-sm",
     {
       // SIZE
       ["rounded-lg px-2 py-1 text-sm"]: size === "lg",
-      ["rounded-3xs p-1 text-xs"]: size === "sm",
+      ["rounded-3xs px-1 py-0.5 text-2xs"]: size === "sm",
 
       // BACKGROUND
       ["bg-gray-700 text-white hover:bg-gray-500"]:

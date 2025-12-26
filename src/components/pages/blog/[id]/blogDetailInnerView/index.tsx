@@ -225,23 +225,6 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
     <>
       {/* 본문 ARTICLE */}
       <div className="col-start-1 col-end-12 mb-10 flex h-fit flex-col justify-center gap-x-[1.5vw] lg:col-start-3 lg:col-end-9 xl:col-start-3 xl:col-end-9">
-        <TagWrapper as="collapsible" align="center">
-          {post?.tags.length ? (
-            post.tags.map((tag) => (
-              <Tag type="button" id={tag.id} title={tag.label} key={tag.id} />
-            ))
-          ) : (
-            <Tag id={0} title={t("noTag")} className="pointer-events-none" />
-          )}
-        </TagWrapper>
-
-        <div
-          className="mb-8 mt-4 text-center text-2xl font-semibold md:text-5xl"
-          style={{ lineHeight: 1.4 }}
-        >
-          {post.title}
-        </div>
-
         <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-2xl">
           <Image
             alt="Thumnail"
@@ -255,8 +238,25 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
           />
         </div>
 
+        <TagWrapper as="collapsible" align="center" className="">
+          {post?.tags.length ? (
+            post.tags.map((tag) => (
+              <Tag type="button" id={tag.id} title={tag.label} key={tag.id} />
+            ))
+          ) : (
+            <Tag id={0} title={t("noTag")} className="pointer-events-none" />
+          )}
+        </TagWrapper>
+
+        <div
+          className="mb-1 text-center text-2xl font-semibold md:text-5xl"
+          style={{ lineHeight: 1.4 }}
+        >
+          {post.title}
+        </div>
+
         {/* INFORMATIONS */}
-        <div className="mb-8 flex flex-wrap items-center justify-center">
+        <div className="mb-4 flex flex-wrap items-center justify-center">
           <div className="group flex cursor-pointer items-center justify-center gap-2 text-sm text-gray-300 transition-all hover:scale-105">
             <FolderIcon size={18} className="group-hover:text-gray-600" />
             <Link

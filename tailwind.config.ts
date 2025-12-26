@@ -15,6 +15,9 @@ const config: Config = {
       fontFamily: {
         sans: ["Wanted Sans Variable", "Wanted Sans", "sans-serif"],
       },
+      fontSize: {
+        "2xs": "0.6875rem",
+      },
       borderRadius: {
         "3xs": "2px",
         lg: "var(--radius)",

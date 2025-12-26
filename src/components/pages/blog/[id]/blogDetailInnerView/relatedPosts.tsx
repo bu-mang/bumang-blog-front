@@ -84,46 +84,46 @@ function RelatedAndAdjacentPostInner({ id }: RelatedPostInnerProps) {
 
   return (
     <>
-      <div className="col-span-full mt-16 grid grid-cols-2 border-t bg-background py-9 md:px-9">
-        {/* 이전 */}
-        {adjacentPosts.previous && (
-          <Link
-            href={PATHNAME.BLOG + `/${adjacentPosts.previous.id}`}
-            className="group flex flex-col gap-1 font-medium text-gray-400 hover:text-gray-700"
-          >
-            <div className="flex items-center gap-1.5">
-              <ArrowLeft size={18} />
-              <span className="text-sm font-semibold">{t("prevPost")}</span>
-            </div>
-
-            <div className="max-w-64 truncate text-left font-medium group-hover:underline">
-              {adjacentPosts.previous.title}
-            </div>
-          </Link>
-        )}
-
+      <div className="col-span-full mt-16 grid grid-cols-2 border-t bg-background py-4">
         {/* 이후 */}
         {adjacentPosts.next ? (
           <Link
             href={PATHNAME.BLOG + `/${adjacentPosts.next.id}`}
-            className="group col-start-2 col-end-3 flex flex-col items-end gap-1 text-gray-400 hover:text-gray-900"
+            className="group col-start-1 col-end-2 flex flex-col gap-1 text-gray-400 hover:text-gray-900"
           >
             <div className="flex items-center gap-1.5">
+              <ArrowLeft size={18} />
               <span className="text-sm font-semibold">{t("nextPost")}</span>
-              <ArrowRight size={18} />
             </div>
 
-            <div className="w-full max-w-64 truncate text-right font-medium group-hover:underline">
+            <div className="w-full max-w-64 truncate text-left font-medium group-hover:underline">
               {adjacentPosts.next.title}
             </div>
           </Link>
         ) : (
           <div />
         )}
+
+        {/* 이전 */}
+        {adjacentPosts.previous && (
+          <Link
+            href={PATHNAME.BLOG + `/${adjacentPosts.previous.id}`}
+            className="group col-start-2 col-end-3 flex flex-col items-end gap-1 font-medium text-gray-400 hover:text-gray-700"
+          >
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold">{t("prevPost")}</span>
+              <ArrowRight size={18} />
+            </div>
+
+            <div className="max-w-64 truncate text-right font-medium group-hover:underline">
+              {adjacentPosts.previous.title}
+            </div>
+          </Link>
+        )}
       </div>
 
-      {/* 이 카테고리의 다른 글 */}
-      <div className="col-start-1 col-end-12 grid grid-cols-9 gap-x-[1.5vw] gap-y-6 bg-background">
+      {/* 연관 포스트 */}
+      <div className="col-span-full grid grid-cols-9 gap-x-[1.5vw] gap-y-6 bg-background">
         <div className="col-span-9 flex justify-center gap-2 text-2xl font-semibold text-foreground">
           <span>{t("relatedPost")}</span>
         </div>
@@ -140,6 +140,7 @@ function RelatedAndAdjacentPostInner({ id }: RelatedPostInnerProps) {
                 groupLabel,
                 tags,
                 author,
+                authorRole,
                 thumbnailUrl,
                 readPermisson,
               },
@@ -162,6 +163,7 @@ function RelatedAndAdjacentPostInner({ id }: RelatedPostInnerProps) {
                     thumbnailUrl={thumbnailUrl}
                     readPermisson={readPermisson}
                     itemViewType="thumbnail"
+                    authorRole={authorRole}
                   />
                 </div>
               );

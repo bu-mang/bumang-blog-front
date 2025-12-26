@@ -8,7 +8,7 @@ import { ButtonBase } from "./button";
 interface ReadPermissionSelectorProps {
   value: RoleType;
   onChange: (permission: RoleType) => void;
-  userRole: "admin" | "user" | null;
+  userRole: "admin" | "user" | "owner" | null;
   className?: string;
 }
 
@@ -17,8 +17,9 @@ interface ReadPermissionSelectorProps {
  * 블로그 포스트의 공개 범위를 선택하는 컴포넌트
  *
  * 권한별 제한사항:
- * - user 역할: "user" 권한만 선택 가능 (public, admin 비활성화)
- * - admin 역할: 모든 권한 선택 가능 (public, user, admin)
+ * - user 역할: "user" 권한만 선택 가능 (public, admin, owner 비활성화)
+ * - admin 역할: public, user, admin 선택 가능 (owner 비활성화)
+ * - owner 역할: 모든 권한 선택 가능 (public, user, admin, owner)
  */
 export default function ReadPermissionSelector({
   value,
@@ -28,9 +29,14 @@ export default function ReadPermissionSelector({
 }: ReadPermissionSelectorProps) {
   const t = useTranslations("blogEdit.publish");
 
-  const handleChangeReadPermission = (role: "admin" | "user" | null) => {
-    // user 역할인 경우 admin, public 선택 불가
-    if (userRole === "user" && (role === "admin" || role === null)) {
+  const handleChangeReadPermission = (role: RoleType) => {
+    // user 역할인 경우 user만 선택 가능
+    if (userRole === "user" && role !== "user") {
+      return;
+    }
+
+    // admin 역할인 경우 owner 선택 불가
+    if (userRole === "admin" && role === "owner") {
       return;
     }
 
@@ -82,13 +88,27 @@ export default function ReadPermissionSelector({
           {t("readPermission.types.admin")}
         </ButtonBase>
 
+        <ButtonBase
+          className={cn(
+            "flex-1 py-2 transition-all active:scale-100",
+            value === "owner" && "text-white",
+            (userRole === "user" || userRole === "admin") &&
+              "cursor-not-allowed opacity-30",
+          )}
+          onClick={() => handleChangeReadPermission("owner")}
+          disabled={userRole === "user" || userRole === "admin"}
+        >
+          {t("readPermission.types.owner")}
+        </ButtonBase>
+
         {/* BACKGROUND */}
         <div
           className={cn(
-            "absolute -z-[1] flex h-full w-1/3 bg-gray-800 transition-all",
+            "absolute -z-[1] flex h-full w-1/4 bg-gray-800 transition-all",
             value === null && "translate-x-0",
             value === "user" && "translate-x-full",
             value === "admin" && "translate-x-[200%]",
+            value === "owner" && "translate-x-[300%]",
             "will-change-transform",
           )}
         />
