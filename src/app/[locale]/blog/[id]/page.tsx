@@ -131,6 +131,5 @@ export default async function BlogDetail({ params }: BlogDetailPageProps) {
     return <BlogDetailInnerViewFallback />;
   }
 
-  // SSR로 불러온 POST DATA가 있으면 SSR, 없으면 CSR
   return <BlogDetailInner post={post} />;
 }
