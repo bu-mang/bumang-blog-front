@@ -16,38 +16,98 @@ const BlogIndex = ({ onStart }: BlogIndexProps) => {
   const [headings, setHeadings] = useState<BlogHeadingComponentType[]>([]);
   const [activeId, setActiveId] = useState<string>();
   const observer = useRef<IntersectionObserver | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // 글의 h1, h2, h3 태그 파싱
-    const headingElements = Array.from(document.querySelectorAll("h1, h2, h3"))
-      .filter((el) => el.id) // id 없는 요소 제외
-      .map((el) => ({
-        id: el.id,
-        // text: el.textContent || "",
-        text: el.textContent || "",
-        level: Number(el.tagName.charAt(1)), // h1, h2, h3 -> 숫자로 변환
-      }));
+    // BlockNote의 heading 구조 파싱
+    // div[data-content-type="heading"][data-level="1,2,3"]의 부모 div[data-id]를 찾음
+    const headingDivs = Array.from(
+      document.querySelectorAll('div[data-content-type="heading"]'),
+    );
+
+    const headingElements = headingDivs
+      .filter((div) => {
+        const level = div.getAttribute("data-level");
+        return level === "1" || level === "2" || level === "3";
+      })
+      .map((div) => {
+        const parentDiv = div.parentElement;
+        const id = parentDiv?.getAttribute("data-id") || "";
+        const level = Number(div.getAttribute("data-level"));
+        const text = div.textContent || "";
+
+        return { id, text, level };
+      })
+      .filter((item) => item.id); // id가 있는 것만 필터링
+
+    console.log("📚 Parsed headings:", headingElements);
 
     // Intersection Observer 설정
     observer.current = new IntersectionObserver(
       (entries) => {
         const visibleEntry = entries.find((entry) => entry.isIntersecting);
-        if (visibleEntry) setActiveId(visibleEntry.target.id);
+        if (visibleEntry) {
+          const id = visibleEntry.target.getAttribute("data-id");
+          console.log("👁️ Intersection detected, setting activeId:", id);
+          if (id) setActiveId(id);
+        }
       },
       { rootMargin: "-50px 0px -60% 0px", threshold: 0.1 },
     );
 
     headingElements.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) observer.current?.observe(element);
+      const element = document.querySelector(`[data-id="${id}"]`);
+      if (element) {
+        console.log("👀 Observing element:", id, element);
+        observer.current?.observe(element);
+      }
     });
     setHeadings(headingElements);
 
     return () => observer.current?.disconnect();
   }, [onStart]);
 
+  // activeId가 변경되면 해당 항목을 스크롤하여 보이게 함
+  useEffect(() => {
+    console.log("🔍 Auto-scroll effect triggered, activeId:", activeId);
+
+    if (!activeId || !containerRef.current) {
+      console.log("❌ Early return - activeId or containerRef missing");
+      return;
+    }
+
+    const activeElement = containerRef.current.querySelector(
+      `[data-heading-id="${activeId}"]`,
+    ) as HTMLElement;
+
+    console.log("🎯 Active element found:", activeElement);
+
+    if (activeElement) {
+      const container = containerRef.current;
+      const elementRect = activeElement.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+
+      // 요소의 컨테이너 내 상대 위치 계산
+      const elementTopRelativeToContainer =
+        elementRect.top - containerRect.top + container.scrollTop;
+
+      // 컨테이너 중앙에 요소를 위치시키기 위한 스크롤 위치
+      const targetScroll =
+        elementTopRelativeToContainer -
+        container.clientHeight / 2 +
+        activeElement.clientHeight / 2;
+
+      container.scrollTo({
+        top: targetScroll,
+        behavior: "smooth",
+      });
+
+      console.log("✅ scrollTo called with:", targetScroll);
+    }
+  }, [activeId]);
+
   const handleScrollTo = (id: string) => {
-    const element = document.getElementById(id);
+    const element = document.querySelector(`[data-id="${id}"]`);
     if (!element) return;
 
     element.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -62,66 +122,51 @@ const BlogIndex = ({ onStart }: BlogIndexProps) => {
 
       // 하단 20% 영역에 도달했는지 확인
       const scrollPercentage = (scrollTop + windowHeight) / documentHeight;
-      setIsVisible(scrollPercentage < 0.8); // 80% 지점까지만 보이기
+      setIsVisible(scrollPercentage < 0.9); // 80% 지점까지만 보이기
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const [marginBottom, setMarginBottom] = useState(0);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { height } = entry.contentRect;
-
-        console.log(height, "height");
-
-        if (height <= 500 && height > 0) {
-          const targetMargin = (window.innerHeight - height) / 2;
-          setMarginBottom(targetMargin);
-        }
-
-        if (height > 500) {
-          const targetMargin = 50;
-          setMarginBottom(targetMargin);
-        }
-      }
-    });
-
-    resizeObserver.observe(containerRef.current);
-
-    return () => resizeObserver.disconnect();
-  }, []);
-
   return (
     <div
-      ref={containerRef}
       className={cn(
-        "fixed hidden h-fit w-[17vw] flex-col gap-2.5 border-l-[2px] transition-opacity duration-300 ease-out lg:flex",
+        "fixed hidden h-fit max-h-80 w-[17vw] border-l-[2px] transition-opacity duration-300 ease-out lg:block",
         isVisible ? "opacity-100" : "opacity-0",
       )}
-      style={{ bottom: marginBottom }}
     >
-      {headings.map((heading) => (
-        <ButtonBase
-          key={heading.id}
-          className={cn(
-            "flex justify-start text-start text-sm text-gray-200 transition-all hover:text-gray-700 hover:underline",
-            activeId === heading.id ? "text-foreground" : "text-gray-400",
-          )}
-          style={{
-            paddingLeft: heading.level * 10,
-            scale: activeId === heading.id ? 1.01 : 1,
-          }}
-          onClick={() => handleScrollTo(heading.id)}
-        >
-          {heading.text}
-        </ButtonBase>
-      ))}
+      {/* Top gradient fade - fixed to parent, won't scroll */}
+      <div className="pointer-events-none absolute left-0 right-0 top-0 z-10 h-14 bg-gradient-to-b from-background to-transparent" />
+
+      {/* Scrollable content */}
+      <div
+        ref={containerRef}
+        className="blog-index-scroll h-full max-h-80 overflow-y-auto"
+      >
+        <div className="flex flex-col gap-2.5">
+          {headings.map((heading) => (
+            <ButtonBase
+              key={heading.id}
+              data-heading-id={heading.id}
+              className={cn(
+                "flex justify-start text-start text-sm text-gray-200 transition-all hover:text-gray-700 hover:underline",
+                activeId === heading.id ? "text-foreground" : "text-gray-400",
+              )}
+              style={{
+                paddingLeft: heading.level * 10,
+                scale: activeId === heading.id ? 1.01 : 1,
+              }}
+              onClick={() => handleScrollTo(heading.id)}
+            >
+              {heading.text}
+            </ButtonBase>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom gradient fade - fixed to parent, won't scroll */}
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-14 bg-gradient-to-t from-background to-transparent" />
     </div>
   );
 };
