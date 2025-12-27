@@ -110,7 +110,13 @@ const BlogIndex = ({ onStart }: BlogIndexProps) => {
     const element = document.querySelector(`[data-id="${id}"]`);
     if (!element) return;
 
-    element.scrollIntoView({ behavior: "smooth", block: "start" });
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - 120;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: "smooth",
+    });
   };
 
   const [isVisible, setIsVisible] = useState(true); // 가시성 상태 추가
@@ -132,17 +138,19 @@ const BlogIndex = ({ onStart }: BlogIndexProps) => {
   return (
     <div
       className={cn(
-        "fixed hidden h-fit max-h-80 w-[17vw] border-l-[2px] transition-opacity duration-300 ease-out lg:block",
+        "fixed hidden h-fit max-h-80 w-[17vw] transition-opacity duration-300 ease-out lg:block",
         isVisible ? "opacity-100" : "opacity-0",
       )}
     >
       {/* Top gradient fade - fixed to parent, won't scroll */}
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-10 h-14 bg-gradient-to-b from-background to-transparent" />
 
+      <div className="absolute left-0 top-0 h-full w-[2px] bg-gray-50" />
+
       {/* Scrollable content */}
       <div
         ref={containerRef}
-        className="blog-index-scroll h-full max-h-80 overflow-y-auto"
+        className="blog-index-scroll h-full max-h-80 overflow-y-auto py-8"
       >
         <div className="flex flex-col gap-2.5">
           {headings.map((heading) => (
