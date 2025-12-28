@@ -65,7 +65,7 @@ export default function BlogThumbnailItem({
       </div>
 
       {/* TITLE */}
-      <div className="my-1 group-hover:text-gray-500 dark:text-gray-50 dark:group-hover:text-white">
+      <div className="mb-1 mt-2 group-hover:text-gray-500 dark:text-gray-50 dark:group-hover:text-white">
         <div className={"flex-1 flex-wrap text-base font-medium leading-tight"}>
           {title}
         </div>
@@ -93,7 +93,7 @@ export default function BlogThumbnailItem({
       >
         <div
           className={cn(
-            "text-2xs w-fit flex-shrink-0 flex-nowrap rounded-md border-gray-300 font-semibold text-gray-300",
+            "w-fit flex-shrink-0 flex-nowrap rounded-md border-gray-300 text-2xs font-semibold text-gray-300",
             authorRole === "user" && "text-red-400",
           )}
         >
