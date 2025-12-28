@@ -49,7 +49,7 @@ const DraftController = ({ className }: DraftControllerProps) => {
     onSerialize,
   } = useBlogEditorContext();
 
-  const content = onSerialize();
+  const content = onSerialize() || [];
   const t = useTranslations("blogEdit.draft");
   const triggerClass = cn(
     "group flex h-10 min-w-24 cursor-pointer items-center justify-center gap-2 rounded-md px-4 transition-all hover:bg-gray-5 dark:hover:bg-gray-800",
@@ -102,7 +102,7 @@ const DraftController = ({ className }: DraftControllerProps) => {
   const saveDraft = useCallback(
     async (draftToSave: DraftData) => {
       setStatus(t("status.saving"));
-      draftToSave.content = onSerialize();
+      draftToSave.content = onSerialize() || [];
 
       try {
         await saveIndexedDBDraft(draftToSave);
@@ -193,7 +193,7 @@ const DraftController = ({ className }: DraftControllerProps) => {
     // 기존 draft를 최신 상태로 저장
     await saveDraft(currentDraft);
 
-    const latestContent = onSerialize();
+    const latestContent = onSerialize() || [];
     const newId = Date.now();
 
     const newDraft = {

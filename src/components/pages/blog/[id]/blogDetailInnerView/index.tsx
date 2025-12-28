@@ -8,9 +8,11 @@ import {
   TagWrapper,
 } from "@/components/common";
 import { PostDetailResponseDto } from "@/types/dto/blog/[id]";
+import { BlockNoteSchema, createCodeBlockSpec } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
+import { codeBlockOptions } from "@blocknote/code-block";
 import { format } from "date-fns";
 import {
   AlignJustifyIcon,
@@ -169,6 +171,21 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
 
   // Create BlockNote editor
   const editor = useCreateBlockNote({
+    schema: BlockNoteSchema.create().extend({
+      blockSpecs: {
+        codeBlock: createCodeBlockSpec({
+          ...codeBlockOptions,
+          defaultLanguage: "typescript",
+          supportedLanguages: {
+            typescript: { name: "TypeScript", aliases: ["ts"] },
+            javascript: { name: "JavaScript", aliases: ["js"] },
+            python: { name: "Python", aliases: ["py"] },
+            java: { name: "Java", aliases: [] },
+            markdown: { name: "Markdown", aliases: ["md"] },
+          },
+        }),
+      },
+    }),
     initialContent: blockNoteContent,
   });
 

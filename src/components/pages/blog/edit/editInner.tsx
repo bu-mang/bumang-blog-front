@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { PartialBlock } from "@blocknote/core";
+import { PartialBlock, BlockNoteSchema, createCodeBlockSpec } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
+import { codeBlockOptions } from "@blocknote/code-block";
 
 import { Divider } from "@/components/common";
 import { BlogEditorToolBar } from "@/components/pages";
@@ -111,6 +112,21 @@ export default function BlogEditInner({
 
   // BlockNote 에디터 초기화
   const editor = useCreateBlockNote({
+    schema: BlockNoteSchema.create().extend({
+      blockSpecs: {
+        codeBlock: createCodeBlockSpec({
+          ...codeBlockOptions,
+          defaultLanguage: "typescript",
+          supportedLanguages: {
+            typescript: { name: "TypeScript", aliases: ["ts"] },
+            javascript: { name: "JavaScript", aliases: ["js"] },
+            python: { name: "Python", aliases: ["py"] },
+            java: { name: "Java", aliases: [] },
+            markdown: { name: "Markdown", aliases: ["md"] },
+          },
+        }),
+      },
+    }),
     uploadFile: async (file: File) => {
       try {
         if (file.size > 10 * 1024 * 1024) {

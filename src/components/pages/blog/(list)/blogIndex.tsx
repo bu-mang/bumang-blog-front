@@ -119,6 +119,7 @@ const BlogIndex = ({ onStart }: BlogIndexProps) => {
     });
   };
 
+  // 관련 포스트 영역이 나올 때 BlogIndex는 faded out 처리
   const [isVisible, setIsVisible] = useState(true); // 가시성 상태 추가
   useEffect(() => {
     const handleScroll = () => {
@@ -128,7 +129,7 @@ const BlogIndex = ({ onStart }: BlogIndexProps) => {
 
       // 하단 20% 영역에 도달했는지 확인
       const scrollPercentage = (scrollTop + windowHeight) / documentHeight;
-      setIsVisible(scrollPercentage < 0.9); // 80% 지점까지만 보이기
+      setIsVisible(scrollPercentage < 0.9); // 90% 지점까지만 보이기
     };
 
     window.addEventListener("scroll", handleScroll);

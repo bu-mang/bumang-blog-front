@@ -2,13 +2,14 @@
  * IndexedDB utility for managing blog drafts
  */
 
+import { PartialBlock } from "@blocknote/core";
 import { CategoryType, GroupType, TagType } from "@/types";
 
-// Draft 타입 (BlockNote로 교체 예정이므로 content는 any로 설정)
+// Draft 타입 (BlockNote 전용)
 export interface DraftData {
   id: number;
   title: string;
-  content: any; // BlockNote document or serialized HTML
+  content: PartialBlock[]; // BlockNote document
   selectedGroup: GroupType | null;
   selectedCategory: CategoryType | null;
   selectedTags: TagType[];
