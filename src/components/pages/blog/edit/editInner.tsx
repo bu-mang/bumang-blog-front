@@ -1,11 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { PartialBlock, BlockNoteSchema, createCodeBlockSpec } from "@blocknote/core";
+import {
+  PartialBlock,
+  BlockNoteSchema,
+  createCodeBlockSpec,
+} from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import { codeBlockOptions } from "@blocknote/code-block";
+import { useTheme } from "next-themes";
 
 import { Divider } from "@/components/common";
 import { BlogEditorToolBar } from "@/components/pages";
@@ -38,6 +43,9 @@ export default function BlogEditInner({
   // i18n
   const t = useTranslations("blogEdit");
   const locale = useLocale();
+
+  // Theme
+  const { theme } = useTheme();
 
   // ------------- 중앙부 그룹/카테고리/태그 로직 -------------
 
@@ -393,7 +401,7 @@ export default function BlogEditInner({
             <div className="flex w-[760px] flex-col">
               {/* INPUT */}
               <textarea
-                className="mx-14 flex h-auto min-h-20 w-full resize-none flex-wrap overflow-hidden rounded-md border-none bg-transparent px-2 py-4 text-5xl font-semibold leading-normal outline-none transition-colors placeholder:text-gray-100 hover:bg-gray-1 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
+                className="flex h-auto min-h-20 w-full resize-none flex-wrap overflow-hidden rounded-md border-none bg-transparent px-14 px-2 py-4 text-5xl font-semibold leading-normal outline-none transition-colors placeholder:text-gray-100 hover:bg-gray-1 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800"
                 placeholder={t("titlePlaceHolder")}
                 tabIndex={1}
                 value={title}
@@ -404,11 +412,15 @@ export default function BlogEditInner({
               {/* DIVIDER */}
               <Divider
                 direction="horizontal"
-                className={"mx-14 w-full bg-gray-5"}
+                className={"w-full bg-gray-5 px-14"}
               />
 
               {/* BLOCKNOTE EDITOR */}
-              <BlockNoteView editor={editor} theme="light" editable={true} />
+              <BlockNoteView
+                editor={editor}
+                theme={theme === "dark" ? "dark" : "light"}
+                editable={true}
+              />
             </div>
           </div>
         </main>

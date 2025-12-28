@@ -13,6 +13,7 @@ import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import { codeBlockOptions } from "@blocknote/code-block";
+import { useTheme } from "next-themes";
 import { format } from "date-fns";
 import {
   AlignJustifyIcon,
@@ -149,6 +150,9 @@ export function BlogDetailInnerViewFallback({
 
 export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
   const t = useTranslations("blogDetail");
+
+  // Theme
+  const { theme } = useTheme();
 
   // 헤더 상태 초기화
   const setDefaultSetting = useHeaderStore((state) => state.setDefaultSetting);
@@ -330,7 +334,11 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
           )}
         </div>
 
-        <BlockNoteView editor={editor} theme="light" editable={false} />
+        <BlockNoteView
+          editor={editor}
+          theme={theme === "dark" ? "dark" : "light"}
+          editable={false}
+        />
       </div>
 
       {/* 목차 */}
