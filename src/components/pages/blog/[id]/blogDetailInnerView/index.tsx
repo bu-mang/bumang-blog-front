@@ -152,7 +152,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
   const t = useTranslations("blogDetail");
 
   // Theme
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   // 헤더 상태 초기화
   const setDefaultSetting = useHeaderStore((state) => state.setDefaultSetting);
@@ -336,7 +336,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
 
         <BlockNoteView
           editor={editor}
-          theme={theme === "dark" ? "dark" : "light"}
+          theme={resolvedTheme === "dark" ? "dark" : "light"}
           editable={false}
         />
       </div>

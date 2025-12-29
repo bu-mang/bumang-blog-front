@@ -45,7 +45,7 @@ export default function BlogEditInner({
   const locale = useLocale();
 
   // Theme
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   // ------------- 중앙부 그룹/카테고리/태그 로직 -------------
 
@@ -387,7 +387,7 @@ export default function BlogEditInner({
   return (
     <EditorErrorBoundary emergencySave={emergencySave}>
       <BlogEditorProvider state={stateValue} actions={actionsValue}>
-        <main className="flex min-h-screen w-full flex-col bg-background">
+        <main className="flex min-h-screen w-full flex-col">
           {/* 상단 헤더 (ToolBar) */}
           <BlogEditorToolBar />
 
@@ -418,7 +418,7 @@ export default function BlogEditInner({
               {/* BLOCKNOTE EDITOR */}
               <BlockNoteView
                 editor={editor}
-                theme={theme === "dark" ? "dark" : "light"}
+                theme={resolvedTheme === "dark" ? "dark" : "light"}
                 editable={true}
               />
             </div>
