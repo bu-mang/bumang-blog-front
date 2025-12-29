@@ -21,7 +21,7 @@ export function LoginInfoAccordion() {
             <li>{t("tooltips.perk.desc2")}</li>
             <li>{t("tooltips.perk.desc3")}</li>
           </ul>
-          <div className="rounded-md bg-gray-5 px-5 py-2 text-muted-foreground">
+          <div className="rounded-md bg-accent px-5 py-2 text-muted-foreground">
             {t("tooltips.perk.hint.1")}
           </div>
         </AccordionContent>

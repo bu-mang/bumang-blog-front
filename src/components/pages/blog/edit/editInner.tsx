@@ -387,7 +387,7 @@ export default function BlogEditInner({
   return (
     <EditorErrorBoundary emergencySave={emergencySave}>
       <BlogEditorProvider state={stateValue} actions={actionsValue}>
-        <main className="flex min-h-screen w-full flex-col">
+        <main className="flex min-h-screen w-full flex-col bg-background">
           {/* 상단 헤더 (ToolBar) */}
           <BlogEditorToolBar />
 
