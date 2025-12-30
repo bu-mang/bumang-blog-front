@@ -94,7 +94,6 @@ export default async function RootLayout({
       <body className="flex-1">
         <NextIntlClientProvider>
           <Providers>
-            {/* {isGridOn && <Grid />} */}
             <Header />
             <div className="w-full overflow-x-hidden">{children}</div>
             <InteractiveBackground />

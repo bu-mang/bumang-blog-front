@@ -1,6 +1,17 @@
 import BlogInner from "@/components/pages/blog/(list)";
 import { getAllPosts } from "@/services/api/blog/(list)";
 import { PaginatedResponseDto, PostListItemType } from "@/types";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: {
+    languages: {
+      'x-default': 'https://bumang.xyz/ko/blog',
+      ko: 'https://bumang.xyz/ko/blog',
+      en: 'https://bumang.xyz/en/blog',
+    },
+  },
+};
 
 interface PageProps {
   params: { category: string };

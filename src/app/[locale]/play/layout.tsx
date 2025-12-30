@@ -3,6 +3,13 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Play", // 최종 결과: "회사소개 | 사이트명"
+  alternates: {
+    languages: {
+      'x-default': 'https://bumang.xyz/ko/play',
+      ko: 'https://bumang.xyz/ko/play',
+      en: 'https://bumang.xyz/en/play',
+    },
+  },
 };
 
 export default function PlayLayout({

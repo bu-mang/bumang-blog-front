@@ -49,6 +49,7 @@ const DraftController = ({ className }: DraftControllerProps) => {
     onSerialize,
   } = useBlogEditorContext();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Required for real-time document tracking
   const content = onSerialize() || [];
   const t = useTranslations("blogEdit.draft");
   const triggerClass = cn(

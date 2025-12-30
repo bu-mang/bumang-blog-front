@@ -93,6 +93,11 @@ export async function generateMetadata({
     },
     alternates: {
       canonical: postUrl,
+      languages: {
+        'x-default': `https://bumang.xyz/ko/blog/${post.id}`,
+        ko: `https://bumang.xyz/ko/blog/${post.id}`,
+        en: `https://bumang.xyz/en/blog/${post.id}`,
+      },
     },
 
     // 추가 메타데이터
