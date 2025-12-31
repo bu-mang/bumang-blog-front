@@ -20,7 +20,7 @@ import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
-import { postCreatePost, patchUpdatePost } from "@/services/api/blog/edit";
+import { postCreatePost, patchUpdatePost, postCreatePreSignedUrl, postUploadS3 } from "@/services/api/blog/edit";
 import { isAxiosError } from "axios";
 import { useAuthStore } from "@/store/auth";
 import { useEditStore } from "@/store/edit";
@@ -245,6 +245,74 @@ export function PublishDrawer() {
     }
   };
 
+  // 외부 URL 이미지를 S3로 업로드
+  const uploadExternalImage = useCallback(async (url: string): Promise<string> => {
+    try {
+      // 외부 이미지 다운로드
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      // 파일명 생성 (URL에서 추출 또는 랜덤)
+      const urlParts = url.split('/');
+      const originalName = urlParts[urlParts.length - 1] || 'pasted-image.jpg';
+      const fileName = `pasted-${Date.now()}-${originalName}`;
+
+      // Blob을 File로 변환
+      const file = new File([blob], fileName, { type: blob.type });
+
+      // S3 업로드
+      const preSignedUrlData = await postCreatePreSignedUrl(file.name, file.type);
+      const { url: uploadUrl, publicUrl } = preSignedUrlData;
+
+      await postUploadS3(uploadUrl, file);
+
+      console.log("✅ External image uploaded:", url, "→", publicUrl);
+      return publicUrl;
+    } catch (error) {
+      console.error("❌ Failed to upload external image:", url, error);
+      return url; // 실패 시 원본 URL 유지
+    }
+  }, []);
+
+  // S3 URL인지 확인
+  const isS3Url = (url: string) => {
+    return url.includes("bumang-blog-s3-storage.s3.ap-northeast-2.amazonaws.com");
+  };
+
+  // 외부 이미지를 S3로 업로드하고 에디터 업데이트
+  const uploadExternalImagesAndUpdateEditor = useCallback(async () => {
+    if (!editor) return;
+
+    const blocks = editor.document;
+    let hasExternalImages = false;
+
+    // 외부 이미지 찾기
+    for (const block of blocks) {
+      if (block.type === "image" && block.props?.url) {
+        const url = block.props.url as string;
+        if (!isS3Url(url)) {
+          hasExternalImages = true;
+          console.log("🔄 Uploading external image:", url);
+
+          // 외부 이미지를 S3로 업로드
+          const newUrl = await uploadExternalImage(url);
+
+          // 에디터에서 URL 업데이트
+          if (newUrl !== url) {
+            editor.updateBlock(block, {
+              type: "image",
+              props: { ...block.props, url: newUrl },
+            });
+          }
+        }
+      }
+    }
+
+    if (hasExternalImages) {
+      console.log("✅ All external images uploaded");
+    }
+  }, [editor, uploadExternalImage]);
+
   // BlockNote에서 이미지와 텍스트 추출
   const getImages = useCallback((): string[] => {
     if (!editor) return [];
@@ -252,12 +320,16 @@ export function PublishDrawer() {
     const imageUrls: string[] = [];
     const blocks = editor.document;
 
+    console.log("🔍 All blocks:", blocks);
+
     blocks.forEach((block) => {
+      console.log("📦 Block type:", block.type, "Props:", block.props);
       if (block.type === "image" && block.props?.url) {
         imageUrls.push(block.props.url as string);
       }
     });
 
+    console.log("🖼️ Found images:", imageUrls);
     return imageUrls;
   }, [editor]);
 
@@ -284,11 +356,19 @@ export function PublishDrawer() {
   }, [editor]);
 
   useEffect(() => {
-    if (open) {
-      setThumbnails(getImages());
-      setPreviewText(getPreviewText().slice(0, 200));
-    }
-  }, [open, getImages, getPreviewText]);
+    const processImages = async () => {
+      if (open) {
+        // 1. 외부 이미지를 S3로 업로드하고 에디터 업데이트
+        await uploadExternalImagesAndUpdateEditor();
+
+        // 2. 썸네일과 미리보기 텍스트 설정
+        setThumbnails(getImages());
+        setPreviewText(getPreviewText().slice(0, 200));
+      }
+    };
+
+    processImages();
+  }, [open, getImages, getPreviewText, uploadExternalImagesAndUpdateEditor]);
 
   // 로딩 상태 확인
   const isActionLoading =
@@ -338,7 +418,7 @@ export function PublishDrawer() {
                   alt="thumbnail Image"
                   fill
                   className="object-cover object-top"
-                  placeholder="blur"
+                  unoptimized
                 />
               ) : (
                 <div className="flex flex-wrap items-center justify-center gap-1">
