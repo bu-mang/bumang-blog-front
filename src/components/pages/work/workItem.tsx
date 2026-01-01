@@ -343,6 +343,7 @@ const WorkItem = ({
             fill
             alt={imgAlt}
             placeholder="blur"
+            sizes="100vw"
           />
         </div>
       </Link>

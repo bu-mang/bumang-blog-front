@@ -226,9 +226,13 @@ const NavBar = ({
   /**
    * @CURRENT_TIMEZONE
    */
-  const currentTimeZone = Intl.DateTimeFormat()
-    .resolvedOptions()
-    .timeZone.split("/")[1];
+  const [currentTimeZone, setCurrentTimeZone] = useState("TZ");
+  useEffect(() => {
+    const resolvedTimeZone = Intl.DateTimeFormat()
+      .resolvedOptions()
+      .timeZone.split("/")[1];
+    setCurrentTimeZone(resolvedTimeZone);
+  }, []);
   /**
    * @CurrentOS
    */

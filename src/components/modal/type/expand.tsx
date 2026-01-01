@@ -209,9 +209,9 @@ export default function ExpandModal({
           }}
           style={{ maxWidth: maxWidth ?? "60%" }}
         >
-          {items.map((item) => {
+          {items.map((item, index) => {
             return (
-              <div key={item.title}>
+              <div key={`${item.imgUrl.src ?? item.imgUrl}-${index}`}>
                 <Image
                   className={cn("flex-1", imageLoading && "opacity-30")}
                   src={item.imgUrl}
@@ -219,8 +219,11 @@ export default function ExpandModal({
                   height={!fill ? item.height : undefined}
                   alt={item.title ?? "galleryImage"}
                   fill={fill}
-                  objectFit={objectFit}
-                  style={{ aspectRatio: `${item.width} / ${item.height}` }}
+                  style={{
+                    aspectRatio: `${item.width} / ${item.height}`,
+                    objectFit,
+                  }}
+                  sizes={fill ? "100vw" : undefined}
                   placeholder={item.placeholder ? "blur" : undefined}
                 />
               </div>

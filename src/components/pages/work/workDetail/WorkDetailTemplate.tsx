@@ -224,7 +224,8 @@ export default function WorkDetailTemplate({
           src={config.bannerImage}
           alt="work_section_background_image"
           fill
-          objectFit="cover"
+          className="object-cover"
+          sizes="100vw"
           placeholder="blur"
         />
       </BackgroundWrapper>

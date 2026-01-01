@@ -256,6 +256,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
             className="bg-gray-100 object-cover object-top"
             priority
             fill
+            sizes="100vw"
           />
         </div>
 

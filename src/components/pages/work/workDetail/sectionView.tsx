@@ -81,7 +81,8 @@ export default function SectionView({
             src={content.image}
             fill
             alt={`${content.title}_image`}
-            style={{ objectFit: "cover" }}
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 33vw"
             placeholder="blur"
             blurDataURL={content.image.toString()}
           />

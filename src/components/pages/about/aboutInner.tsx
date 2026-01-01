@@ -247,6 +247,7 @@ export default function AboutInner({
           className="object-cover"
           fill
           priority
+          sizes="100vw"
           placeholder="blur"
         />
       </div>

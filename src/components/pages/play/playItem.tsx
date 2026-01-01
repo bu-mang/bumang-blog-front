@@ -79,8 +79,9 @@ const PlayItem = ({
           <Image
             src={imgUrl}
             alt={title ?? "GalleryImage"}
-            objectFit="cover"
             fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 16.67vw"
             placeholder={placeholder ? "blur" : undefined}
           />
         </div>

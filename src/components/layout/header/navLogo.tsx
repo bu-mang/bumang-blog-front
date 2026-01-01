@@ -32,6 +32,8 @@ const NavLogo = () => {
   };
 
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const countDebouncingRef = useRef<NodeJS.Timeout | false>(false);
   const [resizeCountUp, setResizeCountUp] = useState(0);
@@ -101,6 +103,9 @@ const NavLogo = () => {
     (state) => state.backgroundColor,
   );
 
+  const logoColor =
+    mounted && resolvedTheme === "dark" ? "#ECE5E5" : "black";
+
   return (
     <div
       className={cn(
@@ -112,7 +117,7 @@ const NavLogo = () => {
     >
       <div className="flex h-fit flex-1 items-center justify-start">
         <Bumang
-          color={resolvedTheme === "dark" ? "#ECE5E5" : "black"}
+          color={logoColor}
           className="BUMANG relative z-50 h-auto w-auto cursor-pointer"
           viewBox="0 0 802 140"
           preserveAspectRatio="xMinYMin meet"
@@ -121,7 +126,7 @@ const NavLogo = () => {
       </div>
       <div className="flex h-fit flex-1 items-center justify-start">
         <Route53
-          color={resolvedTheme === "dark" ? "#ECE5E5" : "black"}
+          color={logoColor}
           className="ROUTE53 relative z-50 h-auto w-auto cursor-pointer"
           viewBox="0 0 802 140"
           preserveAspectRatio="xMinYMin meet"

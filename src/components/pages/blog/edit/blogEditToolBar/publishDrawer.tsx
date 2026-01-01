@@ -418,6 +418,7 @@ export function PublishDrawer() {
                   alt="thumbnail Image"
                   fill
                   className="object-cover object-top"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   unoptimized
                 />
               ) : (
