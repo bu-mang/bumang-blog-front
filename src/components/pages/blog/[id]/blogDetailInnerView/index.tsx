@@ -41,6 +41,7 @@ import { useHeaderStore } from "@/store/header";
 import { parseBlockNoteContent } from "@/utils/contentFormat";
 import useModalStore from "@/store/modal";
 import CommonModal from "@/components/modal/type/common";
+import { cn } from "@/utils/cn";
 
 interface BlogDetailInnerProps {
   post: PostDetailResponseDto;
@@ -335,7 +336,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
       </div>
 
       {/* 목차 */}
-      <div className="relative col-start-9 col-end-11">
+      <div className="relative col-start-9 col-end-12">
         <BlogIndex />
       </div>
 
