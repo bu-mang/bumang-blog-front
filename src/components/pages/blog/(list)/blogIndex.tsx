@@ -6,65 +6,88 @@ import { cn } from "@/utils/cn";
 import { useEffect, useRef, useState } from "react";
 
 interface BlogIndexProps {
-  onStart: boolean;
+  onStart?: boolean;
 }
 
 /**
  * @포스팅_옆_목차_컴포넌트
  */
-const BlogIndex = ({ onStart }: BlogIndexProps) => {
+const BlogIndex = ({ onStart = true }: BlogIndexProps) => {
   const [headings, setHeadings] = useState<BlogHeadingComponentType[]>([]);
   const [activeId, setActiveId] = useState<string>();
   const observer = useRef<IntersectionObserver | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // BlockNote의 heading 구조 파싱
-    // div[data-content-type="heading"][data-level="1,2,3"]의 부모 div[data-id]를 찾음
-    const headingDivs = Array.from(
-      document.querySelectorAll('div[data-content-type="heading"]'),
-    );
+    // BlockNote가 렌더링될 때까지 기다렸다가 heading 파싱
+    const parseHeadings = () => {
+      // BlockNote의 heading 구조 파싱
+      // div[data-content-type="heading"][data-level="1,2,3"]의 부모 div[data-id]를 찾음
+      const headingDivs = Array.from(
+        document.querySelectorAll('div[data-content-type="heading"]'),
+      );
 
-    const headingElements = headingDivs
-      .filter((div) => {
-        const level = div.getAttribute("data-level");
-        return level === "1" || level === "2" || level === "3";
-      })
-      .map((div) => {
-        const parentDiv = div.parentElement;
-        const id = parentDiv?.getAttribute("data-id") || "";
-        const level = Number(div.getAttribute("data-level"));
-        const text = div.textContent || "";
+      const headingElements = headingDivs
+        .filter((div) => {
+          const level = div.getAttribute("data-level");
+          return level === "1" || level === "2" || level === "3";
+        })
+        .map((div) => {
+          const parentDiv = div.parentElement;
+          const id = parentDiv?.getAttribute("data-id") || "";
+          const level = Number(div.getAttribute("data-level"));
+          const text = div.textContent || "";
 
-        return { id, text, level };
-      })
-      .filter((item) => item.id); // id가 있는 것만 필터링
+          return { id, text, level };
+        })
+        .filter((item) => item.id); // id가 있는 것만 필터링
 
-    console.log("📚 Parsed headings:", headingElements);
+      console.log("📚 Parsed headings:", headingElements);
 
-    // Intersection Observer 설정
-    observer.current = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries.find((entry) => entry.isIntersecting);
-        if (visibleEntry) {
-          const id = visibleEntry.target.getAttribute("data-id");
-          console.log("👁️ Intersection detected, setting activeId:", id);
-          if (id) setActiveId(id);
-        }
-      },
-      { rootMargin: "-50px 0px -60% 0px", threshold: 0.1 },
-    );
-
-    headingElements.forEach(({ id }) => {
-      const element = document.querySelector(`[data-id="${id}"]`);
-      if (element) {
-        console.log("👀 Observing element:", id, element);
-        observer.current?.observe(element);
+      // headings가 없으면 조금 후에 다시 시도
+      if (headingElements.length === 0) {
+        return false;
       }
-    });
-    setHeadings(headingElements);
 
-    return () => observer.current?.disconnect();
+      // Intersection Observer 설정
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          const visibleEntry = entries.find((entry) => entry.isIntersecting);
+          if (visibleEntry) {
+            const id = visibleEntry.target.getAttribute("data-id");
+            console.log("👁️ Intersection detected, setting activeId:", id);
+            if (id) setActiveId(id);
+          }
+        },
+        { rootMargin: "-50px 0px -60% 0px", threshold: 0.1 },
+      );
+
+      headingElements.forEach(({ id }) => {
+        const element = document.querySelector(`[data-id="${id}"]`);
+        if (element) {
+          console.log("👀 Observing element:", id, element);
+          observer.current?.observe(element);
+        }
+      });
+      setHeadings(headingElements);
+      return true;
+    };
+
+    // 즉시 시도
+    const success = parseHeadings();
+
+    // 실패하면 100ms 후 재시도
+    let retryTimer: NodeJS.Timeout | null = null;
+    if (!success) {
+      retryTimer = setTimeout(() => {
+        parseHeadings();
+      }, 100);
+    }
+
+    return () => {
+      observer.current?.disconnect();
+      if (retryTimer) clearTimeout(retryTimer);
+    };
   }, [onStart]);
 
   // activeId가 변경되면 해당 항목을 스크롤하여 보이게 함

@@ -23,7 +23,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import BlogIndex from "../../(list)/blogIndex";
 import BlogComment from "./blogComment";
 import RelatedAndAdjacentPost from "./relatedPosts";
@@ -164,7 +164,6 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
   /**
    * EDITOR_LOGIC
    */
-  const [indexParsed, setIndexParsed] = useState(false);
   const user = useAuthStore((state) => state.user);
   const setAllEditState = useEditStore((state) => state.setAllEditState);
 
@@ -192,13 +191,6 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
     }),
     initialContent: blockNoteContent,
   });
-
-  // 파싱 완료 표시
-  useEffect(() => {
-    if (blockNoteContent && blockNoteContent.length > 0) {
-      setIndexParsed(true);
-    }
-  }, [blockNoteContent]);
 
   const handleSetDraft = () => {
     setAllEditState(
@@ -245,7 +237,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
   return (
     <>
       {/* 본문 ARTICLE */}
-      <div className="col-start-1 col-end-12 mb-10 flex h-fit flex-col justify-center gap-x-[1.5vw] lg:col-start-3 lg:col-end-9 xl:col-start-3 xl:col-end-9">
+      <div className="col-start-1 col-end-11 mb-10 flex h-fit flex-col justify-center gap-x-[1.5vw] lg:col-start-3 lg:col-end-9 xl:col-start-3 xl:col-end-9">
         <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-2xl">
           <Image
             alt="Thumnail"
@@ -344,7 +336,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
 
       {/* 목차 */}
       <div className="relative col-start-9 col-end-11">
-        <BlogIndex onStart={indexParsed} />
+        <BlogIndex />
       </div>
 
       {/* 댓글 */}
