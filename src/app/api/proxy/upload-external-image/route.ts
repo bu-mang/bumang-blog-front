@@ -10,14 +10,6 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const DOWNLOAD_TIMEOUT = 8000; // 8초
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// SSRF 방지: 허용된 도메인 화이트리스트
-const ALLOWED_DOMAINS = [
-  "images.unsplash.com",
-  "plus.unsplash.com",
-  "cdn.pixabay.com",
-  "images.pexels.com",
-];
-
 // SSRF 방지: 블랙리스트 IP/도메인
 const BLOCKED_HOSTS = [
   "localhost",
@@ -39,7 +31,7 @@ function validateImageUrl(url: string): boolean {
       return false;
     }
 
-    // 블랙리스트 체크
+    // 블랙리스트 체크 (내부망 차단)
     if (
       BLOCKED_HOSTS.some(
         (blocked) =>
@@ -50,8 +42,8 @@ function validateImageUrl(url: string): boolean {
       return false;
     }
 
-    // 화이트리스트 체크
-    return ALLOWED_DOMAINS.some((domain) => parsedUrl.hostname === domain);
+    // 블랙리스트에 없으면 모두 허용
+    return true;
   } catch {
     return false;
   }
