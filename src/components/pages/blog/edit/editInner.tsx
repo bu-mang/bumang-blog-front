@@ -15,7 +15,11 @@ import { useTheme } from "next-themes";
 import { Divider } from "@/components/common";
 import { BlogEditorToolBar } from "@/components/pages";
 import { EditorErrorBoundary } from "@/components/error/EditorErrorBoundary";
-import { postCreatePreSignedUrl, postUploadS3 } from "@/services/api/blog/edit";
+import {
+  postCreatePreSignedUrl,
+  postUploadS3,
+  postUploadExternalImage,
+} from "@/services/api/blog/edit";
 import { BlogEditorProvider } from "@/contexts/BlogEditorContext";
 
 import { CategoryType, GroupType, TagType } from "@/types";
@@ -137,6 +141,17 @@ export default function BlogEditInner({
     }),
     uploadFile: async (file: File) => {
       try {
+        // 외부 URL 이미지인 경우 (클립보드로 붙여넣은 경우)
+        const isExternalUrl =
+          file.name.startsWith("http://") || file.name.startsWith("https://");
+
+        if (isExternalUrl) {
+          console.log("🔗 External URL detected, using proxy:", file.name);
+          const response = await postUploadExternalImage(file.name);
+          return response.publicUrl;
+        }
+
+        // 로컬 파일인 경우 (기존 로직)
         if (file.size > 10 * 1024 * 1024) {
           throw new Error("파일 크기는 10MB 이하여야 합니다.");
         }

@@ -238,7 +238,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
   return (
     <>
       {/* 본문 ARTICLE */}
-      <div className="col-start-1 col-end-11 mb-10 flex h-fit flex-col justify-center gap-x-[1.5vw] lg:col-start-3 lg:col-end-9 xl:col-start-3 xl:col-end-9">
+      <div className="col-span-full mb-10 flex h-fit flex-col justify-center gap-x-[1.5vw] lg:col-start-3 lg:col-end-9 xl:col-start-3 xl:col-end-9">
         <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-2xl">
           <Image
             alt="Thumnail"

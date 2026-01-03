@@ -20,7 +20,11 @@ import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
-import { postCreatePost, patchUpdatePost, postCreatePreSignedUrl, postUploadS3 } from "@/services/api/blog/edit";
+import {
+  postCreatePost,
+  patchUpdatePost,
+  postUploadExternalImage,
+} from "@/services/api/blog/edit";
 import { isAxiosError } from "axios";
 import { useAuthStore } from "@/store/auth";
 import { useEditStore } from "@/store/edit";
@@ -245,29 +249,13 @@ export function PublishDrawer() {
     }
   };
 
-  // 외부 URL 이미지를 S3로 업로드
+  // 외부 URL 이미지를 S3로 업로드 (프록시 API 사용)
   const uploadExternalImage = useCallback(async (url: string): Promise<string> => {
     try {
-      // 외부 이미지 다운로드
-      const response = await fetch(url);
-      const blob = await response.blob();
-
-      // 파일명 생성 (URL에서 추출 또는 랜덤)
-      const urlParts = url.split('/');
-      const originalName = urlParts[urlParts.length - 1] || 'pasted-image.jpg';
-      const fileName = `pasted-${Date.now()}-${originalName}`;
-
-      // Blob을 File로 변환
-      const file = new File([blob], fileName, { type: blob.type });
-
-      // S3 업로드
-      const preSignedUrlData = await postCreatePreSignedUrl(file.name, file.type);
-      const { url: uploadUrl, publicUrl } = preSignedUrlData;
-
-      await postUploadS3(uploadUrl, file);
-
-      console.log("✅ External image uploaded:", url, "→", publicUrl);
-      return publicUrl;
+      console.log("🔄 Uploading external image via proxy:", url);
+      const response = await postUploadExternalImage(url);
+      console.log("✅ External image uploaded:", url, "→", response.publicUrl);
+      return response.publicUrl;
     } catch (error) {
       console.error("❌ Failed to upload external image:", url, error);
       return url; // 실패 시 원본 URL 유지

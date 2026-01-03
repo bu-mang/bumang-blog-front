@@ -3,6 +3,8 @@ import ClientInstance from "@/services/lib/axios";
 import {
   CreatePostDto,
   CreatePreSignedUrlResponseDto,
+  UploadExternalImageDto,
+  UploadExternalImageResponseDto,
 } from "@/types/dto/blog/edit";
 import axios, { isAxiosError } from "axios";
 
@@ -62,4 +64,28 @@ export const postUploadS3 = async (url: string, file: File) => {
       throw error;
     }
   }
+};
+
+export const postUploadExternalImage = async (
+  imageUrl: string,
+  filename?: string,
+): Promise<UploadExternalImageResponseDto> => {
+  const dto: UploadExternalImageDto = {
+    imageUrl,
+    filename,
+  };
+
+  console.log("🔄 Uploading external image via proxy:", imageUrl);
+
+  const res = await axios.post<UploadExternalImageResponseDto>(
+    "/api/proxy/upload-external-image",
+    dto,
+    {
+      withCredentials: true,
+    },
+  );
+
+  console.log("✅ External image uploaded:", res.data.publicUrl);
+
+  return res.data;
 };

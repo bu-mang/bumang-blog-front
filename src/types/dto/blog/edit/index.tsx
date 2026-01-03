@@ -15,3 +15,14 @@ export interface CreatePreSignedUrlResponseDto {
   publicUrl: string;
   url: string;
 }
+
+export interface UploadExternalImageDto {
+  imageUrl: string;
+  filename?: string;
+}
+
+export interface UploadExternalImageResponseDto {
+  publicUrl: string;
+  key: string;
+  originalUrl: string;
+}
