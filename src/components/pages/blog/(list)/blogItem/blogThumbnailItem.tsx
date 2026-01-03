@@ -53,7 +53,7 @@ export default function BlogThumbnailItem({
   return (
     <Link href={"/blog/" + id} className="group" onClick={handleNavigate}>
       {/* IMAGE */}
-      <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg bg-gray-50">
+      <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg bg-secondary">
         <Image
           src={thumbnailUrl || getThumbnailByGroup(groupLabel, "blogItem")}
           alt="postImage"

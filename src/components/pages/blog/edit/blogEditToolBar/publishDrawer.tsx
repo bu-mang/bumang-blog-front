@@ -62,7 +62,7 @@ export function PublishDrawer() {
   const [readPermission, setReadPermission] = useState<RoleType>(
     queryId && editDraft?.readPermission !== undefined
       ? editDraft.readPermission
-      : null
+      : null,
   );
   const [thumbnails, setThumbnails] = useState<string[]>([]);
   const [previewText, setPreviewText] = useState("");
@@ -250,21 +250,31 @@ export function PublishDrawer() {
   };
 
   // 외부 URL 이미지를 S3로 업로드 (프록시 API 사용)
-  const uploadExternalImage = useCallback(async (url: string): Promise<string> => {
-    try {
-      console.log("🔄 Uploading external image via proxy:", url);
-      const response = await postUploadExternalImage(url);
-      console.log("✅ External image uploaded:", url, "→", response.publicUrl);
-      return response.publicUrl;
-    } catch (error) {
-      console.error("❌ Failed to upload external image:", url, error);
-      return url; // 실패 시 원본 URL 유지
-    }
-  }, []);
+  const uploadExternalImage = useCallback(
+    async (url: string): Promise<string> => {
+      try {
+        console.log("🔄 Uploading external image via proxy:", url);
+        const response = await postUploadExternalImage(url);
+        console.log(
+          "✅ External image uploaded:",
+          url,
+          "→",
+          response.publicUrl,
+        );
+        return response.publicUrl;
+      } catch (error) {
+        console.error("❌ Failed to upload external image:", url, error);
+        return url; // 실패 시 원본 URL 유지
+      }
+    },
+    [],
+  );
 
   // S3 URL인지 확인
   const isS3Url = (url: string) => {
-    return url.includes("bumang-blog-s3-storage.s3.ap-northeast-2.amazonaws.com");
+    return url.includes(
+      "bumang-blog-s3-storage.s3.ap-northeast-2.amazonaws.com",
+    );
   };
 
   // 외부 이미지를 S3로 업로드하고 에디터 업데이트
@@ -392,7 +402,7 @@ export function PublishDrawer() {
 
           <div className="flex gap-4 px-4">
             {/* Thumbnail */}
-            <div className="relative flex aspect-video h-full flex-1 items-center justify-center overflow-hidden rounded-lg bg-gray-10 text-gray-200">
+            <div className="relative flex aspect-video h-full flex-1 items-center justify-center overflow-hidden rounded-lg bg-secondary text-gray-200">
               {thumbnails.length > 0 || selectedGroup ? (
                 <Image
                   src={

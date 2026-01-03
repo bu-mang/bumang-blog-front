@@ -246,7 +246,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
               post?.thumbnailUrl ||
               getThumbnailByGroup(post.group.label, "postBanner")
             }
-            className="bg-gray-100 object-cover object-top"
+            className="bg-secondary object-cover object-top"
             priority
             fill
             sizes="100vw"

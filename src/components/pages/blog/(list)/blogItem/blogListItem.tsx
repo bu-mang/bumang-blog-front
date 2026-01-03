@@ -127,7 +127,7 @@ export default function BlogListItem({
       </div>
 
       {/* IMAGE */}
-      <div className="relative flex h-[135px] w-full max-w-[240px] shrink-0 cursor-pointer items-center overflow-hidden rounded-lg bg-gray-50">
+      <div className="relative flex h-[135px] w-full max-w-[240px] shrink-0 cursor-pointer items-center overflow-hidden rounded-lg bg-secondary">
         <Image
           src={thumbnailUrl || getThumbnailByGroup(groupLabel, "blogItem")}
           alt="postImage"
