@@ -212,10 +212,8 @@ export function PublishDrawer() {
         console.log("Post updated successfully!");
         toast.success("Post updated successfully!");
         setIsLoading(false);
-        setOpen(false);
 
-        // Drawer 애니메이션 완료 대기 후 redirect
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // 바로 redirect
         const targetUrl = PATHNAME.BLOG + `/${queryId}`;
         console.log("Redirecting to:", targetUrl);
         router.push(targetUrl);
@@ -237,15 +235,14 @@ export function PublishDrawer() {
       console.log("Post created successfully!");
       toast.success("Post published successfully!");
       setIsLoading(false);
-      setOpen(false);
 
-      // Drawer 애니메이션 완료 대기 후 redirect
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // 바로 redirect
       console.log("Redirecting to:", PATHNAME.BLOG);
       router.push(PATHNAME.BLOG);
     } catch (error) {
       // onError 콜백에서 처리되므로 여기서는 로그만
       console.error("Mutation failed:", error);
+      setIsLoading(false);
     }
   };
 
