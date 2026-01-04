@@ -9,7 +9,7 @@ const intlMiddleware = createMiddleware(routing);
 // Rate Limiting을 위한 메모리 저장소
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
 
-// 차단할 봇 목록
+// 차단할 봇 목록 (강화)
 const blockedBots = [
   "amazonbot",
   "ahrefsbot",
@@ -25,6 +25,21 @@ const blockedBots = [
   "go-http-client",
   "axios/",
   "postman",
+  "petalbot", // Huawei search
+  "yandexbot", // Russian search
+  "baiduspider", // Chinese search
+  "bytespider", // TikTok
+  "claudebot", // AI crawler
+  "gptbot", // OpenAI crawler
+  "anthropic-ai", // Anthropic
+  "cohere-ai", // Cohere
+  "bytedance", // ByteDance
+  "meta-externalagent", // Meta AI
+  "applebot-extended", // Apple AI training
+  "ccbot", // Common Crawl
+  "omgili", // Webhose
+  "dataforseo", // DataForSEO
+  "zoominfobot", // ZoomInfo
 ];
 
 // 허용할 검증된 봇 (크롤링 속도 제한만 적용)
@@ -119,7 +134,12 @@ export default async function middleware(request: NextRequest) {
     return intlMiddleware(request);
   }
 
-  const ip = request.ip || request.headers.get("x-forwarded-for") || "unknown";
+  // CloudFront를 사용하는 경우 X-Forwarded-For에서 실제 클라이언트 IP 추출
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const ip = forwardedFor
+    ? forwardedFor.split(",")[0].trim() // 첫 번째 IP만 사용
+    : request.ip || "unknown";
+
   const userAgent = request.headers.get("user-agent") || "";
   const userAgentLower = userAgent.toLowerCase();
   // 1. 악성 봇 차단
@@ -145,11 +165,11 @@ export default async function middleware(request: NextRequest) {
     let rateLimitResponse: NextResponse | null;
 
     if (isVerifiedBot) {
-      // 검증된 봇: 1분에 300회
-      rateLimitResponse = applyRateLimit(ip, 300, 60000);
+      // 검증된 봇: 1분에 100회 (더 엄격하게)
+      rateLimitResponse = applyRateLimit(ip, 100, 60000);
     } else {
-      // 일반 사용자: 1분에 200회 (한 페이지에 많은 요청이 발생할 수 있음)
-      rateLimitResponse = applyRateLimit(ip, 200, 60000);
+      // 일반 사용자: 1분에 60회 (Netlify 사용량 초과 방지)
+      rateLimitResponse = applyRateLimit(ip, 60, 60000);
     }
 
     if (rateLimitResponse) {

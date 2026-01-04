@@ -4,15 +4,13 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone", // Docker 최적화를 위한 standalone 빌드
   images: {
     domains: [
       "images.unsplash.com",
       "plus.unsplash.com",
-      "bumang-blog-s3-storage.s3.ap-northeast-2.amazonaws.com", // 내 S3..
-    ],
-  },
-  experimental: {
-    optimizePackageImports: ["@chakra-ui/react"],
+      process.env.NEXT_PUBLIC_S3_DOMAIN || "bumang-blog-s3-storage.s3.ap-northeast-2.amazonaws.com",
+    ].filter(Boolean), // undefined 제거
   },
 
   webpack(config) {
