@@ -1,0 +1,64 @@
+name: Deploy Frontend to EC2 with Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      - name: Build and Push Frontend Docker image
+        run: |
+          docker buildx build \
+          --platform linux/arm64 \
+          --file Dockerfile.prod \
+          --push \
+          -t ${{ secrets.DOCKER_USERNAME }}/bumang-blog-frontend:latest \
+          .
+
+      - name: Deploy Frontend to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/bumang-blog-front
+            git pull
+
+            docker pull ${{ secrets.DOCKER_USERNAME }}/bumang-blog-frontend:latest
+
+            cd /home/ec2-user/bumang-blog-backend
+            docker-compose -f docker-compose.prod.yaml --env-file .env.production up -d frontend
+
+            echo "⏳ 프론트엔드가 올라올 때까지 대기..."
+            sleep 15
+
+            echo "🔍 컨테이너 상태 확인..."
+            docker ps | grep frontend
+
+            echo "📋 프론트엔드 컨테이너 로그 확인..."
+            docker logs bumang_blog_frontend --tail 50
+
+            echo "🚀 Next.js 앱 상태 확인 중..."
+            curl -f http://localhost:4000/ || echo "프론트엔드 연결 실패"
+
+            echo "🗑️ 불필요한 이미지 정리..."
+            docker image prune -f
+
+            echo "✅ 프론트엔드 배포 완료!"
