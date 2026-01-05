@@ -27,6 +27,8 @@ jobs:
           docker buildx build \
           --platform linux/arm64 \
           --file Dockerfile.prod \
+          --build-arg NEXT_PUBLIC_API_BASE_URL=https://api.bumang.xyz \
+          --build-arg NEXT_PUBLIC_S3_DOMAIN=bumang-blog-s3-storage.s3.ap-northeast-2.amazonaws.com \
           --push \
           -t ${{ secrets.DOCKER_USERNAME }}/bumang-blog-frontend:latest \
           .

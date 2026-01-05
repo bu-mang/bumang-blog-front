@@ -14,7 +14,7 @@ import {
 } from "@/components/common";
 import { useRouter } from "@/i18n/navigation";
 import { GroupType, CategoryType } from "@/types";
-import DraftController from "../blogEditToolBar/draftController";
+import DraftController from "./draftController";
 import { PublishDrawer } from "@/components/pages/blog/edit/blogEditToolBar/publishDrawer";
 import { useTranslations } from "next-intl";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
