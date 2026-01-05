@@ -127,7 +127,7 @@ bumang-blog-front/
 │   └── assets/                # 이미지, 폰트 등
 ├── public/                    # 정적 파일
 ├── src/middleware.ts         # Next.js Middleware (인증, Rate Limiting)
-├── netlify.toml              # Netlify 배포 설정
+├── Dockerfile.prod           # 프로덕션 Docker 이미지 빌드 설정
 └── next.config.mjs           # Next.js 설정
 ```
 
@@ -169,15 +169,48 @@ npm start
 프로젝트 루트에 `.env.local` 파일을 생성하고 다음 변수들을 설정하세요:
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://your-api-url.com
+NEXT_PUBLIC_API_BASE_URL=https://<<SECRET-URL>>.com
+NEXT_PUBLIC_S3_DOMAIN=<<SECRET-S3-BUCKETNAME>>.s3.region.amazonaws.com
 ```
 
 ## 배포
 
-이 프로젝트는 Netlify에 배포되어 있습니다.
+이 프로젝트는 **AWS EC2**에 **Docker** 컨테이너로 배포되며, **GitHub Actions**를 통해 자동 배포됩니다.
+
+### 배포 아키텍처
+
+- **인프라**: AWS EC2 (t4g.small, ARM64)
+- **컨테이너화**: Docker (Multi-stage build)
+- **CI/CD**: GitHub Actions
+- **이미지 레지스트리**: Docker Hub
+- **웹 서버**: Nginx (리버스 프록시)
+- **SSL**: Let's Encrypt (Certbot)
+
+### 배포 프로세스
+
+1. **main 브랜치에 push** 시 GitHub Actions 워크플로우 자동 실행
+2. **Docker 이미지 빌드**:
+   - Multi-stage build로 최적화된 프로덕션 이미지 생성
+   - 빌드 시 환경변수 (`NEXT_PUBLIC_*`) 주입
+   - ARM64 플랫폼용 이미지 빌드
+3. **Docker Hub에 푸시**: `bumang/bumang-blog-frontend:latest`
+4. **EC2 배포**:
+   - SSH로 EC2 접속
+   - 최신 이미지 pull
+   - docker-compose로 컨테이너 재시작
+   - 자동 헬스체크 및 로그 확인
+
+### 수동 배포
+
+로컬에서 프로덕션 이미지를 빌드하려면:
 
 ```bash
-npm run deploy
+docker build \
+  -f Dockerfile.prod \
+  --build-arg NEXT_PUBLIC_API_BASE_URL=https://api.bumang.xyz \
+  --build-arg NEXT_PUBLIC_S3_DOMAIN=<<SECRET-S3-BUCKETNAME>>.s3.region.amazonaws.com \
+  -t bumang-blog-frontend:latest \
+  .
 ```
 
 ## 주요 페이지
