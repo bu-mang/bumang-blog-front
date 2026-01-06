@@ -165,11 +165,11 @@ export default async function middleware(request: NextRequest) {
     let rateLimitResponse: NextResponse | null;
 
     if (isVerifiedBot) {
-      // 검증된 봇: 1분에 100회 (더 엄격하게)
-      rateLimitResponse = applyRateLimit(ip, 100, 60000);
+      // 검증된 봇: 1분에 200회
+      rateLimitResponse = applyRateLimit(ip, 200, 60000);
     } else {
-      // 일반 사용자: 1분에 60회 (Netlify 사용량 초과 방지)
-      rateLimitResponse = applyRateLimit(ip, 60, 60000);
+      // 일반 사용자: 1분에 120회
+      rateLimitResponse = applyRateLimit(ip, 120, 60000);
     }
 
     if (rateLimitResponse) {
