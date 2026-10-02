@@ -34,6 +34,9 @@ const nextConfig = {
       "plus.unsplash.com",
       process.env.NEXT_PUBLIC_S3_DOMAIN || "bumang-blog-s3-storage.s3.ap-northeast-2.amazonaws.com",
     ].filter(Boolean), // undefined 제거
+    // S3 키에 업로드 타임스탬프가 들어가 같은 URL의 내용이 바뀌지 않으므로 1년 캐시.
+    // (S3 객체에 Cache-Control이 없어 기본값 60초로 내려가던 것을 대체)
+    minimumCacheTTL: 31536000,
   },
 
   webpack(config) {

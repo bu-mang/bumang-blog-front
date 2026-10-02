@@ -58,6 +58,7 @@
     "react-markdown": "^10.1.0",
     "react-toastify": "^11.0.5",
     "remark-gfm": "^4.0.1",
+    "sharp": "^0.33.5",
     "slate": "^0.102.0",
     "slate-react": "^0.102.0",
     "tailwind-merge": "^2.6.0",
