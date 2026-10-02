@@ -1,7 +1,7 @@
-export { default as backend } from "./backend.png";
-export { default as frontend } from "./frontend.png";
-export { default as computerScience } from "./computerScience.png";
-export { default as interactive } from "./interactive.png";
-export { default as life } from "./life.png";
-export { default as projects } from "./projects.png";
-export { default as infrastructure } from "./infrastructure.png";
+export { default as backend } from "./backend.webp";
+export { default as frontend } from "./frontend.webp";
+export { default as computerScience } from "./computerScience.webp";
+export { default as interactive } from "./interactive.webp";
+export { default as life } from "./life.webp";
+export { default as projects } from "./projects.webp";
+export { default as infrastructure } from "./infrastructure.webp";
