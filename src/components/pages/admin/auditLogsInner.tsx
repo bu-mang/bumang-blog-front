@@ -61,7 +61,8 @@ function HostView() {
         <h1 className="text-3xl font-semibold">감사 로그</h1>
       </div>
       <p className="mb-6 text-sm text-gray-400">
-        위치는 IP 기반 추정이라 대략적입니다.
+        위치는 IP 기반 추정이라 대략적입니다. 엣지는 요청을 받은 Cloudflare
+        거점(ICN=서울, LAX=로스앤젤레스 등)입니다.
       </p>
 
       {/* TABS */}
@@ -136,6 +137,7 @@ function LoginAttemptsPanel() {
               <TableHead>결과</TableHead>
               <TableHead>이메일</TableHead>
               <TableHead>위치 (대략)</TableHead>
+              <TableHead>엣지</TableHead>
               <TableHead>IP</TableHead>
               <TableHead>기기</TableHead>
               <TableHead>사유</TableHead>
@@ -173,7 +175,10 @@ function AttemptRow({ row }: { row: LoginAttempt }) {
       </TableCell>
       <TableCell className="whitespace-nowrap">{row.email}</TableCell>
       <TableCell className="whitespace-nowrap">
-        {formatLocation(row.country, row.city)}
+        {formatLocation(row.country, row.region, row.city)}
+      </TableCell>
+      <TableCell className="whitespace-nowrap text-gray-500">
+        {row.colo ?? "—"}
       </TableCell>
       <TableCell className="whitespace-nowrap text-gray-500">
         {row.ip ?? "—"}
@@ -224,6 +229,8 @@ function ContentViewsPanel() {
               <TableHead>글</TableHead>
               <TableHead className="whitespace-nowrap">가려진 블록</TableHead>
               <TableHead>위치 (대략)</TableHead>
+              <TableHead>엣지</TableHead>
+              <TableHead>유입</TableHead>
               <TableHead>IP</TableHead>
               <TableHead>기기</TableHead>
             </TableRow>
@@ -282,7 +289,16 @@ function ContentViewRow({ row }: { row: ContentView }) {
         {row.maskedBlockCount > 0 ? `${row.maskedBlockCount}개` : "—"}
       </TableCell>
       <TableCell className="whitespace-nowrap">
-        {formatLocation(row.country, row.city)}
+        {formatLocation(row.country, row.region, row.city)}
+      </TableCell>
+      <TableCell className="whitespace-nowrap text-gray-500">
+        {row.colo ?? "—"}
+      </TableCell>
+      <TableCell
+        className="max-w-64 truncate whitespace-nowrap text-gray-500"
+        title={row.referer ?? undefined}
+      >
+        {formatReferer(row.referer)}
       </TableCell>
       <TableCell className="whitespace-nowrap text-gray-500">
         {row.ip ?? "—"}
@@ -391,6 +407,26 @@ function formatWhen(iso: string) {
   });
 }
 
-function formatLocation(country: string | null, city: string | null) {
-  return [country, city].filter(Boolean).join(" · ") || "—";
+function formatLocation(
+  country: string | null,
+  region: string | null,
+  city: string | null,
+) {
+  // 서울처럼 시/도와 도시가 같은 이름이면 한 번만 쓴다.
+  const parts = [country, region, city !== region ? city : null];
+  return parts.filter(Boolean).join(" · ") || "—";
+}
+
+// 표에서는 호스트+경로만 보여준다(전체 주소는 title 툴팁). 사이트 안에서 이동한 경우는 경로만.
+function formatReferer(referer: string | null) {
+  if (!referer) return "—";
+  try {
+    const url = new URL(referer);
+    const path = url.pathname === "/" ? "" : url.pathname;
+    return url.hostname.endsWith("bumang.xyz")
+      ? path || "/"
+      : url.hostname + path;
+  } catch {
+    return referer;
+  }
 }

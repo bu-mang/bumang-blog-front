@@ -7,7 +7,11 @@ export interface LoginAttempt {
   failureReason: string | null;
   ip: string | null;
   country: string | null;
+  // 시/도. Cloudflare 위치 헤더 기반이라 대략적이고 비어 있을 수 있다.
+  region: string | null;
   city: string | null;
+  // 요청을 받은 Cloudflare 엣지(공항 코드, 예: ICN/LAX).
+  colo: string | null;
   userAgent: string | null;
   createdAt: string;
 }
@@ -35,7 +39,13 @@ export interface ContentView {
   maskedBlockCount: number;
   ip: string | null;
   country: string | null;
+  // 시/도. Cloudflare 위치 헤더 기반이라 대략적이고 비어 있을 수 있다.
+  region: string | null;
   city: string | null;
+  // 요청을 받은 Cloudflare 엣지(공항 코드, 예: ICN/LAX).
+  colo: string | null;
+  // 유입 경로(Referer). 직접 방문이면 null.
+  referer: string | null;
   userAgent: string | null;
   createdAt: string;
 }

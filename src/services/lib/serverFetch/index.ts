@@ -13,8 +13,11 @@ import { cookies, headers } from "next/headers";
  */
 const VISITOR_HEADERS = [
   "cf-ipcountry", // 국가 코드
+  "cf-region", // 시/도 (Cloudflare Managed Transforms "Add visitor location headers")
+  "cf-ipcity", // 도시 (위와 같은 설정)
   "x-forwarded-for", // 방문자 IP 체인 (백엔드는 첫 항목을 방문자로 본다)
   "user-agent", // 방문자 브라우저 (봇 판별의 유일한 단서)
+  "referer", // 유입 경로 (방문자가 이 페이지로 오기 직전 주소)
 ] as const;
 
 /**
@@ -27,6 +30,14 @@ const VISITOR_HEADERS = [
  * 백엔드는 이 헤더를 최우선으로 읽으므로, 내부 경로에서는 이게 곧 방문자 IP다.
  */
 const CF_CONNECTING_IP = "cf-connecting-ip";
+
+/**
+ * 방문자 요청을 받은 Cloudflare 엣지를 담은 헤더(꼬리표가 ICN/LAX 같은 공항 코드).
+ * 백엔드가 "한국 방문자가 해외 엣지로 빠지는 비율"을 보려고 기록한다.
+ * Cloudflare가 요청마다 새로 붙이는 값이라 공개 경로로는 넘길 의미가 없고,
+ * cf-connecting-ip처럼 거절당할 여지도 남기지 않으려고 내부 경로로만 넘긴다.
+ */
+const CF_RAY = "cf-ray";
 
 /**
  * 같은 호스트(도커 네트워크) 안의 백엔드로 직행하는 주소.
@@ -78,7 +89,7 @@ export default async function serverFetch<T>(
   try {
     const incoming = headers();
     const namesToForward: readonly string[] = target.internal
-      ? [CF_CONNECTING_IP, ...VISITOR_HEADERS]
+      ? [CF_CONNECTING_IP, CF_RAY, ...VISITOR_HEADERS]
       : VISITOR_HEADERS;
     for (const name of namesToForward) {
       if (headersToUse.has(name)) continue;
@@ -93,6 +104,7 @@ export default async function serverFetch<T>(
   // Cloudflare가 403으로 튕겨서 요청 자체가 실패하기 때문이다.
   if (!target.internal) {
     headersToUse.delete(CF_CONNECTING_IP);
+    headersToUse.delete(CF_RAY);
   }
 
   // 서버 컴포넌트에서 쿠키 가져오기
