@@ -40,6 +40,7 @@ import { getUserGroups } from "@/services/api/userGroups";
 import { CategoryType, GroupType, TagType } from "@/types";
 
 import { sortStringOrder } from "@/utils/sortTagOrder";
+import { compressImageFile } from "@/utils/compressImage/client";
 import { useEditStore } from "@/store/edit";
 import useModalStore from "@/store/modal";
 import CommonModal from "@/components/modal/type/common";
@@ -253,10 +254,16 @@ export default function BlogEditInner({
           throw new Error("파일 크기는 10MB 이하여야 합니다.");
         }
 
-        const preSignedUrl = await postCreatePreSignedUrl(file.name, file.type);
+        // S3는 올린 그대로 저장하고 본문은 그 원본을 직접 불러오므로 올리기 전에 줄인다.
+        const uploadTarget = await compressImageFile(file);
+
+        const preSignedUrl = await postCreatePreSignedUrl(
+          uploadTarget.name,
+          uploadTarget.type,
+        );
         const { url, publicUrl } = preSignedUrl;
 
-        await postUploadS3(url, file);
+        await postUploadS3(url, uploadTarget);
 
         return publicUrl;
       } catch (error) {

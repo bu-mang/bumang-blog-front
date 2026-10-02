@@ -7,6 +7,7 @@ import {
   CreatePreSignedUrlResponseDto,
 } from "@/types/dto/blog/edit";
 import { END_POINTS } from "@/constants/api/endpoints";
+import { compressImageBlob } from "@/utils/compressImage/server";
 
 // dns/net 사용을 위해 Node 런타임 강제(Edge 런타임 불가)
 export const runtime = "nodejs";
@@ -194,6 +195,10 @@ export async function POST(request: NextRequest) {
     const finalFilename =
       filename || `external-${Date.now()}-${originalName.split("?")[0]}`;
 
+    // 5-1. 올리기 전에 압축 (변환 불가·이득 없음이면 원본 그대로)
+    const upload = await compressImageBlob(blob, contentType, finalFilename);
+    console.log(`🗜️ Compressed: ${blob.size} → ${upload.body.size} bytes`);
+
     // 6. 백엔드에서 Presigned URL 요청
     console.log("📝 Requesting presigned URL from backend");
     const presignedResponse = await fetch(
@@ -205,8 +210,8 @@ export async function POST(request: NextRequest) {
           Cookie: `accessToken=${accessToken.value}`,
         },
         body: JSON.stringify({
-          filename: finalFilename,
-          mimetype: contentType,
+          filename: upload.filename,
+          mimetype: upload.contentType,
         }),
       },
     );
@@ -228,9 +233,9 @@ export async function POST(request: NextRequest) {
     const uploadResponse = await fetch(uploadUrl, {
       method: "PUT",
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": upload.contentType,
       },
-      body: blob,
+      body: upload.body,
     });
 
     if (!uploadResponse.ok) {
