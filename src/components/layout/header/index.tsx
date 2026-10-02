@@ -1,4 +1,4 @@
-import HeaderInner, { HeaderFallback } from "./headerInner";
+import HeaderInner from "./headerInner";
 import { getLocale } from "next-intl/server";
 
 async function Header() {

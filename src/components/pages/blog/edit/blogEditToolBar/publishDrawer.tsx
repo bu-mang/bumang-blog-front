@@ -26,7 +26,7 @@ import {
   postUploadExternalImage,
 } from "@/services/api/blog/edit";
 import { isAxiosError } from "axios";
-import { useAuthStore } from "@/store/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEditStore } from "@/store/edit";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -54,7 +54,7 @@ export function PublishDrawer() {
   const { fillStyle: DarkFillStyle, textStyle: DarkTextStyle } =
     getButtonColorStyle("dark");
 
-  const user = useAuthStore((state) => state.user);
+  const { user } = useAuth();
   const editDraft = useEditStore((state) => state.editDraft);
 
   const params = useSearchParams();

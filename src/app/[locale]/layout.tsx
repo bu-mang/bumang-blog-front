@@ -8,6 +8,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import OpenedModals from "@/components/modal/openedModals";
 import { Metadata } from "next";
+import { getCurrentUser } from "@/services/api/auth/server";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: {
@@ -75,6 +77,9 @@ export default async function RootLayout({
     notFound();
   }
 
+  // 로그인 여부를 여기서 확정해 내려준다 — 첫 화면부터 로그인 상태가 맞게 그려진다.
+  const user = await getCurrentUser();
+
   return (
     <html suppressHydrationWarning lang={locale}>
       <head>
@@ -92,18 +97,20 @@ export default async function RootLayout({
       <body className="flex-1">
         <NextIntlClientProvider>
           <Providers>
-            <Header />
-            <div className="w-full overflow-x-hidden">{children}</div>
-            <InteractiveBackground />
-            <Footer />
-            <OpenedModals />
-            <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              closeOnClick
-              pauseOnHover
-            />
+            <AuthProvider user={user}>
+              <Header />
+              <div className="w-full overflow-x-hidden">{children}</div>
+              <InteractiveBackground />
+              <Footer />
+              <OpenedModals />
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                closeOnClick
+                pauseOnHover
+              />
+            </AuthProvider>
           </Providers>
         </NextIntlClientProvider>
       </body>

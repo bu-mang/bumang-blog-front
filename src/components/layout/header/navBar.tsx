@@ -21,7 +21,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
-import { useAuthStore } from "@/store/auth";
 import { useTheme } from "next-themes";
 import { useHeaderStore } from "@/store/header";
 
@@ -30,7 +29,6 @@ gsap.registerPlugin(ScrollTrigger);
 interface NavBarProps {
   isAuthenticated: boolean;
   locale: string;
-  isLoading?: boolean;
   nickname?: string;
 }
 
@@ -38,7 +36,6 @@ interface NavBarProps {
 const NavBar = ({
   isAuthenticated,
   locale,
-  isLoading,
   nickname,
 }: NavBarProps) => {
   const pathname = usePathname();
@@ -113,19 +110,11 @@ const NavBar = ({
     return () => ctx.revert();
   }, [pathname, headerBorderBottom, animState]);
 
-  const setUserAndIsAuthenticated = useAuthStore(
-    (state) => state.setUserAndIsAuthenticated,
-  );
-
+  // 로그아웃 후에는 전체 새로고침 — 서버가 익명 상태로 다시 그려 내려준다.
   const logoutMutation = useMutation({
     mutationFn: postLogout,
     onSuccess: () => {
       window.location.href = PATHNAME.HOME; // full reload
-      setUserAndIsAuthenticated({
-        isAuthenticated: false,
-        isAuthLoading: false,
-        user: null,
-      });
     },
   });
   const handleLogout = async () => {
@@ -269,8 +258,6 @@ const NavBar = ({
                 <span className={linkHoverStyle}>Logout</span>
               </Button>
             </div>
-          ) : isLoading ? (
-            <div className={linkHoverStyle}>loading...</div>
           ) : (
             <Link href="/login" className={linkHoverStyle}>
               Login

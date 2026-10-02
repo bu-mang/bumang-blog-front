@@ -1,5 +1,4 @@
 import { LoginFormType } from "@/types/schemas";
-import { UserResponseType, UserType } from "@/types/user";
 import { END_POINTS } from "@/constants/api/endpoints";
 import ClientInstance from "@/services/lib/axios";
 
@@ -7,10 +6,10 @@ import ClientInstance from "@/services/lib/axios";
 export async function postLogin(formData: LoginFormType) {
   const { username, password } = formData;
 
+  // 토큰은 응답 본문이 아니라 httpOnly 쿠키로만 온다 — JS는 토큰을 볼 수 없다.
   const res = await ClientInstance.post<{
-    accessToken: string;
-    refreshToken: string;
-    user: UserType;
+    success: boolean;
+    message: string;
   }>(END_POINTS.POST_LOGIN, {
     email: username,
     password,
@@ -25,12 +24,3 @@ export async function postLogout() {
 
   return res.data;
 }
-
-// 유저 정보 불러오기 (Client)
-export const getUserProfile = async () => {
-  const userProfileRes = await ClientInstance.get<UserResponseType>(
-    END_POINTS.GET_USER_PROFILE,
-  );
-
-  return userProfileRes.data;
-};

@@ -10,7 +10,6 @@ export const QUERY_KEY = {
   ) => ["POSTS", pageIndex, pageSize, groupId, categoryId, tagIds, postType],
 
   // USER
-  GET_USER_PROFILE: ["GET_USER_PROFILE"],
 
   // BLOG_DETAIL
   GET_RELATED_POSTS: (id: number | string) => ["RELATED_POSTS", id],

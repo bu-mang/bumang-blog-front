@@ -4,7 +4,7 @@ import { LuLayoutGrid, LuLayoutList, LuPlus, LuUndo2 } from "react-icons/lu";
 import { Link } from "@/i18n/navigation";
 import { getButtonColorStyle } from "@/utils/styles/filButtonManager";
 import { cn } from "@/utils/cn";
-import { useAuthStore } from "@/store/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useQueryParams } from "@/hooks/useQueryParams";
 import { useEditStore } from "@/store/edit";
 
@@ -31,7 +31,7 @@ const LabelWithUtil = ({
     isDraggable && "pointer-events-none",
     className,
   );
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { isAuthenticated } = useAuth();
   const { updateQuery } = useQueryParams();
   const upperCaseCapital = title.charAt(0).toUpperCase() + title.slice(1);
 

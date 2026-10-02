@@ -1,10 +1,10 @@
-import { useAuthStore } from "@/store/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { RoleType } from "@/types";
 
 type RoleScore = Exclude<RoleType, null> | "anon";
 
 export const useCheckPermission = (readPermission: RoleType) => {
-  const user = useAuthStore((state) => state.user);
+  const { user } = useAuth();
 
   const permissionScore: Record<RoleScore, number> = {
     anon: 0,

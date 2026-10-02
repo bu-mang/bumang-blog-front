@@ -11,9 +11,6 @@ import { loginFormSchema, LoginFormType } from "@/types/schemas";
 import { isAxiosError } from "axios";
 import { useRouter } from "@/i18n/navigation";
 import { postLogin } from "@/services/api/auth/client";
-import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEY } from "@/constants/api/queryKey";
-import { useAuthStore } from "@/store/auth";
 import { useTranslations } from "next-intl";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
 import { toast } from "react-toastify";
@@ -30,20 +27,13 @@ const LoginForm = () => {
   });
 
   const t = useTranslations("login");
-  const queryClient = useQueryClient();
 
   // 유효하면 Server Action Trigger
   const onSubmit = async (formData: LoginFormType) => {
     try {
-      const res = await postLogin(formData);
+      await postLogin(formData);
 
-      await queryClient.invalidateQueries({
-        queryKey: QUERY_KEY.GET_USER_PROFILE,
-      });
-      // await queryClient.refetchQueries({
-      //   queryKey: QUERY_KEY.GET_USER_PROFILE,
-      // });
-
+      // 전체 새로고침 — 서버가 로그인 상태로 다시 그려 내려준다.
       window.location.href = PATHNAME.HOME; // full reload
     } catch (error) {
       console.error(error);

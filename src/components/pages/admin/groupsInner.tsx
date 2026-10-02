@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, UserMinus, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 
-import { useAuthStore } from "@/store/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   addUserGroupMember,
   createUserGroup,
@@ -23,22 +23,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 export default function AdminGroupsInner() {
-  const user = useAuthStore((s) => s.user);
-  const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
+  const { user } = useAuth();
 
-  if (isAuthLoading) return <FullPageLoader />;
   if (user?.role !== "host") return <Forbidden />;
 
   return <OwnerView />;
-}
-
-function FullPageLoader() {
-  return (
-    <div className="mx-auto max-w-3xl px-6 pt-24">
-      <Skeleton className="mb-4 h-8 w-48" />
-      <Skeleton className="h-32 w-full" />
-    </div>
-  );
 }
 
 function Forbidden() {

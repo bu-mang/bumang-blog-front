@@ -28,7 +28,7 @@ import { useParams, useRouter } from "next/navigation";
 import { PATHNAME } from "@/constants/routes/pathnameRoutes";
 import { getThumbnailByGroup } from "@/utils/getThumnailByGroup";
 import { Link } from "@/i18n/navigation";
-import { useAuthStore } from "@/store/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEditStore } from "@/store/edit";
 import { useMutation } from "@tanstack/react-query";
 import { deletePost } from "@/services/api/blog/edit";
@@ -171,12 +171,11 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
   /**
    * EDITOR_LOGIC
    */
-  const user = useAuthStore((state) => state.user);
-  const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
+  const { user } = useAuth();
 
-  // 조회수 증가: 세션당 1회(sessionStorage). 인증 확정 후 판정하며, 본인 글은 세지 않는다.
+  // 조회수 증가: 세션당 1회(sessionStorage). 본인 글은 세지 않는다.
+  // (로그인 여부는 서버가 확정해 내려주므로 첫 렌더에서 바로 판정할 수 있다.)
   useEffect(() => {
-    if (isAuthLoading) return; // 인증 확정 전엔 보류(본인 여부 판정 불가)
     if (user && post.authorNickname === user.nickname) return; // 본인 글은 조회수 제외
     const key = `viewed:${post.id}`;
     if (sessionStorage.getItem(key)) return;
@@ -192,7 +191,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
     };
     increment();
     // eslint-disable-next-line
-  }, [isAuthLoading]);
+  }, []);
 
   const setAllEditState = useEditStore((state) => state.setAllEditState);
   const router = useRouter();

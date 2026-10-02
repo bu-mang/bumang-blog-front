@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/utils/cn";
 
 import { LuCircleAlert } from "react-icons/lu";
-import { useAuthStore } from "@/store/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { BlogItemFallback } from "./blogItem";
 import { PagenationFallback } from "@/components/common/pageNation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,7 +39,7 @@ export default function BlogInner({
   pageIndex,
   pageSize,
 }: BlogListViewProps) {
-  const user = useAuthStore((state) => state.user);
+  const { user } = useAuth();
 
   const setDefaultSetting = useHeaderStore((state) => state.setDefaultSetting);
   useEffect(() => {

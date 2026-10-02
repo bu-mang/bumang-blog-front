@@ -4,8 +4,7 @@ import Link from "next/link";
 import { ScrollText, Users, ChevronRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { useAuthStore } from "@/store/auth";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 
 type AdminSection = {
   href: string;
@@ -31,10 +30,8 @@ const SECTIONS: AdminSection[] = [
 ];
 
 export default function AdminHomeInner() {
-  const user = useAuthStore((s) => s.user);
-  const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
+  const { user } = useAuth();
 
-  if (isAuthLoading) return <FullPageLoader />;
   if (user?.role !== "host") return <Forbidden />;
 
   return (
@@ -72,18 +69,6 @@ export default function AdminHomeInner() {
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-function FullPageLoader() {
-  return (
-    <div className="mx-auto max-w-3xl px-6 pt-24">
-      <Skeleton className="mb-8 h-8 w-48" />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Skeleton className="h-24 w-full" />
-        <Skeleton className="h-24 w-full" />
-      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, ShieldAlert } from "lucide-react";
 
-import { useAuthStore } from "@/store/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import { getContentViews, getLoginAttempts } from "@/services/api/audit";
 import { ContentView, LoginAttempt } from "@/types/auditLog";
 import { Button } from "@/components/ui/button";
@@ -24,22 +24,11 @@ const PAGE_SIZE = 50;
 type TabKey = "login" | "content";
 
 export default function AdminAuditLogsInner() {
-  const user = useAuthStore((s) => s.user);
-  const isAuthLoading = useAuthStore((s) => s.isAuthLoading);
+  const { user } = useAuth();
 
-  if (isAuthLoading) return <FullPageLoader />;
   if (user?.role !== "host") return <Forbidden />;
 
   return <HostView />;
-}
-
-function FullPageLoader() {
-  return (
-    <div className="mx-auto max-w-5xl px-6 pt-24">
-      <Skeleton className="mb-4 h-8 w-48" />
-      <Skeleton className="h-64 w-full" />
-    </div>
-  );
 }
 
 function Forbidden() {
