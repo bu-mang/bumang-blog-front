@@ -6,6 +6,11 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig = {
   output: "standalone", // Docker 최적화를 위한 standalone 빌드
 
+  experimental: {
+    // src/instrumentation.ts를 서버 시작 시 실행 (sharp 캐시 끄기). Next 15부터는 기본 동작.
+    instrumentationHook: true,
+  },
+
   // 보안 헤더 (CSP는 YouTube 임베드/inline 스크립트 호환성 검증 후 별도 적용)
   async headers() {
     return [
