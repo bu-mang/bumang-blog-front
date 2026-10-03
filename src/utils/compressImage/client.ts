@@ -1,5 +1,6 @@
 import {
-  MAX_DIMENSION,
+  MAX_HEIGHT,
+  MAX_WIDTH,
   WEBP_QUALITY,
   isCompressibleType,
   toWebpFilename,
@@ -18,7 +19,8 @@ export async function compressImageFile(file: File): Promise<File> {
 
     const scale = Math.min(
       1,
-      MAX_DIMENSION / Math.max(bitmap.width, bitmap.height),
+      MAX_WIDTH / bitmap.width,
+      MAX_HEIGHT / bitmap.height,
     );
     const width = Math.round(bitmap.width * scale);
     const height = Math.round(bitmap.height * scale);

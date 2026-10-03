@@ -3,8 +3,13 @@
 // S3에는 올린 그대로 저장되고 본문 <img>와 OG 이미지는 그 원본을 직접 불러온다
 // (/_next/image를 거치는 건 썸네일뿐). 그래서 올리기 전에 줄여야 한다.
 
-// 긴 변 상한. 레티나 스크린샷(가로 3000px대)을 확대 모달에서 봐도 충분한 크기.
-export const MAX_DIMENSION = 2560;
+// 가로 상한. next.config.mjs의 images.deviceSizes 최댓값과 같게 둔다 — 화면에 그보다 넓게
+// 그릴 일이 없으니 더 크게 저장해 봐야 용량만 차지한다.
+export const MAX_WIDTH = 2048;
+
+// 세로 상한. 긴 스크린샷은 세로가 길어도 글자가 읽혀야 하므로 가로보다 넉넉하게 둔다.
+// (가로·세로 비율은 유지한 채 두 상한 안에 들어오도록 줄인다.)
+export const MAX_HEIGHT = 4096;
 
 export const WEBP_QUALITY = 85;
 

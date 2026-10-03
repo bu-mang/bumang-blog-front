@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import {
-  MAX_DIMENSION,
+  MAX_HEIGHT,
+  MAX_WIDTH,
   WEBP_QUALITY,
   isCompressibleType,
   toWebpFilename,
@@ -26,8 +27,8 @@ export async function compressImageBlob(
     const output = await sharp(Buffer.from(await blob.arrayBuffer()))
       .rotate() // EXIF 회전을 픽셀에 반영
       .resize({
-        width: MAX_DIMENSION,
-        height: MAX_DIMENSION,
+        width: MAX_WIDTH,
+        height: MAX_HEIGHT,
         fit: "inside",
         withoutEnlargement: true,
       })
