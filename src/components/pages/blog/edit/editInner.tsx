@@ -41,6 +41,10 @@ import { CategoryType, GroupType, TagType } from "@/types";
 
 import { sortStringOrder } from "@/utils/sortTagOrder";
 import { compressImageFile } from "@/utils/compressImage/client";
+import {
+  isEmptyParagraphMarker,
+  splitLinesIntoParagraphs,
+} from "@/utils/markdownParagraphs";
 import { useEditStore } from "@/store/edit";
 import useModalStore from "@/store/modal";
 import CommonModal from "@/components/modal/type/common";
@@ -231,7 +235,30 @@ export default function BlogEditInner({
         editor.getTextCursorPosition().block.type === "codeBlock";
 
       if (plain && !hasFiles && !inCodeBlock && looksLikeMarkdown(plain)) {
-        editor.pasteMarkdown(plain);
+        // 줄마다 문단을 나누고 빈 줄은 빈 문단으로 살린다 (utils/markdownParagraphs 참고).
+        const parsed = editor.tryParseMarkdownToBlocks(
+          splitLinesIntoParagraphs(plain),
+        );
+        const blocks = parsed.map((block) => {
+          const content = block.content;
+          const only =
+            Array.isArray(content) && content.length === 1 ? content[0] : null;
+          const isMarker =
+            block.type === "paragraph" &&
+            only !== null &&
+            "text" in only &&
+            isEmptyParagraphMarker(only.text);
+          return isMarker ? { ...block, content: [] } : block;
+        });
+        if (blocks.length === 0) return defaultPasteHandler();
+
+        const current = editor.getTextCursorPosition().block;
+        const currentIsEmpty =
+          current.type === "paragraph" &&
+          Array.isArray(current.content) &&
+          current.content.length === 0;
+        if (currentIsEmpty) editor.replaceBlocks([current], blocks);
+        else editor.insertBlocks(blocks, current, "after");
         return true;
       }
 
