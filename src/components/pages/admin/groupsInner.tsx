@@ -19,8 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const SLUG_PATTERN = /^[a-z0-9-]+$/;
+import { SLUG_MAX_LENGTH, SLUG_PATTERN } from "@/utils/slug";
 
 export default function AdminGroupsInner() {
   const { user } = useAuth();
@@ -73,12 +72,16 @@ function OwnerView() {
 
   const handleCreate = () => {
     if (!form.name.trim()) return toast.error("이름을 입력해주세요");
-    if (!form.slug.trim() || !SLUG_PATTERN.test(form.slug)) {
-      return toast.error("slug는 소문자/숫자/하이픈만 사용해 주세요");
+    // slug는 비워도 된다 — 백엔드가 이름에서 만든다 (이름이 한글이면 400으로 직접 달라고 한다)
+    const slug = form.slug?.trim() || undefined;
+    if (slug && !SLUG_PATTERN.test(slug)) {
+      return toast.error(
+        "slug는 소문자·숫자를 하이픈 하나로 이어 써 주세요 (예: close-friends)",
+      );
     }
     createMutation.mutate({
       name: form.name.trim(),
-      slug: form.slug.trim(),
+      slug,
       description: form.description?.trim() || undefined,
       color: form.color?.trim() || undefined,
     });
@@ -106,11 +109,11 @@ function OwnerView() {
             />
           </div>
           <div>
-            <Label htmlFor="g-slug">slug</Label>
+            <Label htmlFor="g-slug">slug (영문 이름이면 비워도 됨)</Label>
             <Input
               id="g-slug"
-              value={form.slug}
-              maxLength={50}
+              value={form.slug ?? ""}
+              maxLength={SLUG_MAX_LENGTH}
               placeholder="예: friends"
               onChange={(e) => setForm({ ...form, slug: e.target.value })}
             />

@@ -27,7 +27,8 @@ export interface UserGroup {
 
 export interface CreateUserGroupDto {
   name: string;
-  slug: string;
+  /** 비우면 백엔드가 이름에서 만든다 */
+  slug?: string;
   description?: string;
   color?: string;
 }
