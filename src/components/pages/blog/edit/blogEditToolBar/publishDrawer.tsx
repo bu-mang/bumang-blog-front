@@ -427,11 +427,7 @@ export function PublishDrawer() {
                 <Image
                   src={
                     thumbnails?.[thumbnailIndex] ??
-                    getThumbnailByGroup(
-                      selectedGroup?.label ?? "",
-                      "blogItem",
-                    ) ??
-                    ""
+                    getThumbnailByGroup(selectedGroup?.slug, "blogItem")
                   } // thumbnails
                   alt="thumbnail Image"
                   fill
@@ -522,6 +518,7 @@ export function PublishDrawer() {
                       <Tag
                         key={item.id}
                         id={item.id}
+                        slug={item.slug}
                         title={item.title}
                         className="w-fit"
                       />

@@ -19,9 +19,9 @@ interface BlogItemProps {
   title: string;
   previewText: string;
   categoryLabel: string;
-  categoryId: number | null;
+  categorySlug: string | null;
   groupLabel: string;
-  groupId: number | null;
+  groupSlug: string | null;
   author: string;
   tags: TagCompactType[];
   date: string;
@@ -39,9 +39,9 @@ const BlogItem = ({
   title,
   previewText,
   categoryLabel,
-  categoryId,
+  categorySlug,
   groupLabel,
-  groupId,
+  groupSlug,
   author,
   authorRole,
   tags,
@@ -84,9 +84,9 @@ const BlogItem = ({
     title,
     previewText,
     categoryLabel,
-    categoryId,
+    categorySlug,
     groupLabel,
-    groupId,
+    groupSlug,
     tags,
     date,
     thumbnailUrl,

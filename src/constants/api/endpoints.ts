@@ -1,3 +1,5 @@
+import type { PostListFilter } from "@/types";
+
 // API END POINT의 분류 팩토리
 export const END_POINTS = {
   // AUTH
@@ -11,15 +13,24 @@ export const END_POINTS = {
   // BLOG
   GET_GROUP_CATEGORY_MENU_TREE: "/categories/groups/menu",
   GET_ALL_TAGS: "/tags",
+  // 분류 필터는 slug로 보낸다 (?group=backend&category=architecture&tag=aws&tag=kubernetes)
   GET_ALL_POSTS: (
     pageIndex: number,
     pageSize: number,
-    groupId?: number,
-    categoryId?: number,
-    tagIds?: string | string[],
-    type?: string,
-  ) =>
-    `/posts?pageIndex=${pageIndex}&pageSize=${pageSize}&groupId=${groupId ?? ""}&categoryId=${categoryId ?? ""}&type=${type ?? ""}&${typeof tagIds === "string" ? `tagIds=${tagIds}` : tagIds?.map((tag) => `tagIds=${tag}`).join("&")}`,
+    filter: PostListFilter = {},
+  ) => {
+    const params = new URLSearchParams({
+      pageIndex: `${pageIndex}`,
+      pageSize: `${pageSize}`,
+    });
+    if (filter.group) params.set("group", filter.group);
+    if (filter.category) params.set("category", filter.category);
+    if (filter.type) params.set("type", filter.type);
+    const tags =
+      typeof filter.tag === "string" ? [filter.tag] : (filter.tag ?? []);
+    tags.forEach((tag) => params.append("tag", tag));
+    return `/posts?${params.toString()}`;
+  },
 
   // BLOG/EDIT
   POST_CREATE_POST: "/posts",

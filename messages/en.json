@@ -535,6 +535,12 @@
       "desc": "It can be read by... ",
       "buttonText": "Go to Login",
       "ariaLabel": "You need Login."
+    },
+    "tagLimit": {
+      "title": "You can pick up to {max} tags.",
+      "desc": "Remove one to pick another.",
+      "buttonText": "OK",
+      "ariaLabel": "Tag limit reached."
     }
   }
 }

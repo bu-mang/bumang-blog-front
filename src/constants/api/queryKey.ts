@@ -1,13 +1,12 @@
+import type { PostListFilter } from "@/types";
+
 export const QUERY_KEY = {
   // POST
   GET_POSTS: (
     pageIndex: number,
     pageSize: number,
-    groupId?: number,
-    categoryId?: number,
-    tagIds?: string | string[],
-    postType?: string,
-  ) => ["POSTS", pageIndex, pageSize, groupId, categoryId, tagIds, postType],
+    filter: PostListFilter = {},
+  ) => ["POSTS", pageIndex, pageSize, filter] as const,
 
   // USER
 

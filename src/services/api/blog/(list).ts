@@ -1,7 +1,12 @@
 import { END_POINTS } from "@/constants/api/endpoints";
 import ClientInstance from "@/services/lib/axios";
 import serverFetch from "@/services/lib/serverFetch";
-import { TagType, PaginatedResponseDto, PostListItemType } from "@/types";
+import {
+  TagType,
+  PaginatedResponseDto,
+  PostListFilter,
+  PostListItemType,
+} from "@/types";
 import { GroupType } from "@/types/category";
 
 // Group & Category 트리 조회 (ServerFetch)
@@ -26,21 +31,11 @@ export const getAllTags = async () => {
 export const getAllPosts = async (
   pageIndex: number,
   pageSize: number,
-  groupId?: number,
-  categoryId?: number,
-  tagIds?: string | string[],
-  type?: string,
+  filter: PostListFilter = {},
 ) => {
   const res = await serverFetch<PaginatedResponseDto<PostListItemType>>(
     process.env.NEXT_PUBLIC_API_BASE_URL +
-      END_POINTS.GET_ALL_POSTS(
-        pageIndex,
-        pageSize,
-        groupId,
-        categoryId,
-        tagIds,
-        type,
-      ),
+      END_POINTS.GET_ALL_POSTS(pageIndex, pageSize, filter),
   );
 
   return res;

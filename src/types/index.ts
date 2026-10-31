@@ -26,6 +26,7 @@ import {
 
 import {
   PaginatedResponseDto,
+  PostListFilter,
   PostListItemType,
 } from "@/types/dto/blog/(list)";
 
@@ -67,6 +68,7 @@ export type {
 
   // BLOG DTO
   PaginatedResponseDto,
+  PostListFilter,
   PostListItemType,
 
   // LAYOUT

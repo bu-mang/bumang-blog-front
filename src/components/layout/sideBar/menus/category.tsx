@@ -6,34 +6,34 @@ import { Link } from "@/i18n/navigation";
 
 interface CategoryProps {
   title: string;
-  categoryId: number;
-  currentCategoryId?: number;
+  categorySlug: string;
+  currentCategorySlug?: string;
   type: "Life" | "Dev";
 }
 
 const Category = ({
   title,
   type,
-  currentCategoryId,
-  categoryId,
+  currentCategorySlug,
+  categorySlug,
 }: CategoryProps) => {
   const { updateQuery } = useQueryParams();
 
   return (
     <Link
       href={updateQuery(
-        { categoryId: `${categoryId}` },
+        { category: categorySlug },
         {
           type: type === "Life" ? "dev" : "life",
-          groupId: null,
+          group: null,
           pageIndex: null,
-          tagIds: null,
+          tag: null,
         },
       )}
       prefetch={false}
       className={cn(
         "group flex items-center justify-between rounded-lg px-2 py-0.5 font-normal text-gray-700 transition-all dark:text-gray-100",
-        categoryId === currentCategoryId && "font-bold underline",
+        categorySlug === currentCategorySlug && "font-bold underline",
       )}
     >
       <span className="truncate text-sm transition-all duration-200 group-hover:underline">

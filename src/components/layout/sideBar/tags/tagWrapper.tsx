@@ -4,6 +4,7 @@ import { Tag, TagWrapper } from "@/components/common";
 import { TagType } from "@/types";
 import { LucideAlertCircle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { capTagFilters } from "@/constants/taxonomy";
 
 interface TagWrapperLayerProps {
   tags: TagType[] | null;
@@ -11,7 +12,7 @@ interface TagWrapperLayerProps {
 
 const TagWrapperLayer = ({ tags }: TagWrapperLayerProps) => {
   const params = useSearchParams();
-  const tagIds = params.getAll("tagIds");
+  const activeTagSlugs = capTagFilters(params.getAll("tag"));
 
   return (
     <TagWrapper className="pr-8">
@@ -21,9 +22,10 @@ const TagWrapperLayer = ({ tags }: TagWrapperLayerProps) => {
             <Tag
               key={tag.id}
               id={tag.id}
+              slug={tag.slug}
               title={tag.title}
               type="link"
-              isActivated={tagIds.includes(`${tag.id}`)}
+              isActivated={activeTagSlugs.includes(tag.slug)}
               hasXButton
             />
           );

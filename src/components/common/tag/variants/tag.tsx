@@ -5,12 +5,19 @@ import { useQueryParams } from "@/hooks/useQueryParams";
 import { Link } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/utils/cn";
-import React from "react";
+import { MAX_TAG_FILTERS, capTagFilters } from "@/constants/taxonomy";
+import CustomNotification from "@/components/common/customNotification";
+import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
+import React, { MouseEventHandler } from "react";
 import { LuX as CloseIcon } from "react-icons/lu";
+import { toast } from "react-toastify";
 
 export interface TagProps {
   id: number;
   title: string;
+  /** type="link"일 때 필터 주소(?tag=)에 쓰는 고정 키. 없으면 링크가 아무 데도 안 간다 */
+  slug?: string;
 
   url?: string;
   onClick?: () => void;
@@ -29,6 +36,7 @@ export interface TagProps {
 const Tag = ({
   id,
   title,
+  slug,
 
   onClick,
   className,
@@ -43,6 +51,32 @@ const Tag = ({
 }: TagProps) => {
   const { updateArrayQuery } = useQueryParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const t = useTranslations("alert");
+
+  // 태그 필터는 최대 MAX_TAG_FILTERS개 — 다 찼으면 아직 안 고른 태그는 추가하지 않는다
+  const activeTagSlugs = capTagFilters(searchParams.getAll("tag"));
+  const isTagLimitReached =
+    type === "link" &&
+    !!slug &&
+    !activeTagSlugs.includes(slug) &&
+    activeTagSlugs.length >= MAX_TAG_FILTERS;
+
+  const handleLinkClick: MouseEventHandler<HTMLAnchorElement> = (e) => {
+    if (!isTagLimitReached) return;
+    e.preventDefault();
+
+    toast(CustomNotification, {
+      toastId: "tag-filter-limit", // 여러 번 눌러도 하나만 뜨게
+      data: {
+        title: t("tagLimit.title", { max: MAX_TAG_FILTERS }),
+        content: t("tagLimit.desc"),
+        buttonText: t("tagLimit.buttonText"),
+      },
+      ariaLabel: t("tagLimit.ariaLabel"),
+      autoClose: 3000,
+    });
+  };
 
   const handleClick = () => {
     if (setIsActivated) setIsActivated();
@@ -72,8 +106,10 @@ const Tag = ({
   if (type === "link") {
     return (
       <Link
-        href={updateArrayQuery("tagIds", `${id}`, "add")}
-        className={tagClass}
+        href={slug ? updateArrayQuery("tag", slug, "add") : "#"}
+        onClick={handleLinkClick}
+        aria-disabled={isTagLimitReached}
+        className={cn(tagClass, isTagLimitReached && "opacity-40")}
       >
         <span>{title}</span>
         {isActivated && !!hasBackground && !!hasXButton && (
@@ -81,7 +117,7 @@ const Tag = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              router.push(updateArrayQuery("tagIds", `${id}`, "remove"));
+              if (slug) router.push(updateArrayQuery("tag", slug, "remove"));
             }}
           />
         )}

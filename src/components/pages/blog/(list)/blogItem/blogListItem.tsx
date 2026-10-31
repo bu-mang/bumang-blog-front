@@ -20,6 +20,7 @@ interface BlogListItemProps {
   previewText: string;
   categoryLabel: string;
   groupLabel: string;
+  groupSlug: string | null;
   tags: TagCompactType[];
   date: string;
   thumbnailUrl: string | null;
@@ -40,6 +41,7 @@ export default function BlogListItem({
   previewText,
   categoryLabel,
   groupLabel,
+  groupSlug,
   tags,
   date,
   id,
@@ -148,7 +150,7 @@ export default function BlogListItem({
       {/* IMAGE */}
       <div className="relative flex h-[135px] w-full max-w-[240px] shrink-0 cursor-pointer items-center overflow-hidden rounded-lg bg-secondary">
         <Image
-          src={thumbnailUrl || getThumbnailByGroup(groupLabel, "blogItem")}
+          src={thumbnailUrl || getThumbnailByGroup(groupSlug, "blogItem")}
           alt="postImage"
           className="object-cover"
           sizes="(max-width: 768px) 300px, 400px"

@@ -19,9 +19,9 @@ interface BlogThumbnailItemProps {
   title: string;
   previewText: string;
   categoryLabel: string;
-  categoryId: number | null;
+  categorySlug: string | null;
   groupLabel: string;
-  groupId: number | null;
+  groupSlug: string | null;
   tags: TagCompactType[];
   date: string;
   thumbnailUrl: string | null;
@@ -39,9 +39,9 @@ export default function BlogThumbnailItem({
   title,
   previewText,
   categoryLabel,
-  categoryId,
+  categorySlug,
   groupLabel,
-  groupId,
+  groupSlug,
   tags,
   date,
   id,
@@ -66,7 +66,7 @@ export default function BlogThumbnailItem({
         {/* IMAGE */}
         <div className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg bg-secondary">
           <Image
-            src={thumbnailUrl || getThumbnailByGroup(groupLabel, "blogItem")}
+            src={thumbnailUrl || getThumbnailByGroup(groupSlug, "blogItem")}
             alt="postImage"
             className="object-cover object-top transition-all group-hover:scale-110"
             sizes="(max-width: 768px) 300px, 400px"
@@ -91,9 +91,9 @@ export default function BlogThumbnailItem({
       {/* GROUP & CATEGORY → 필터 이동 (호버 언더라인) */}
       <div className="mt-2.5 flex flex-col justify-center">
         <span className="line-clamp-1 flex-nowrap text-xs font-semibold text-gray-300">
-          {groupId != null ? (
+          {groupSlug != null ? (
             <Link
-              href={`${PATHNAME.BLOG}?groupId=${groupId}`}
+              href={`${PATHNAME.BLOG}?group=${groupSlug}`}
               className="hover:text-gray-500 hover:underline"
             >
               {groupLabel}
@@ -102,9 +102,9 @@ export default function BlogThumbnailItem({
             groupLabel
           )}
           {": "}
-          {categoryId != null ? (
+          {categorySlug != null ? (
             <Link
-              href={`${PATHNAME.BLOG}?categoryId=${categoryId}`}
+              href={`${PATHNAME.BLOG}?category=${categorySlug}`}
               className="hover:text-gray-500 hover:underline"
             >
               {categoryLabel}
@@ -161,7 +161,7 @@ export default function BlogThumbnailItem({
         {tags?.map((tag) => (
           <Link
             key={tag.id}
-            href={`${PATHNAME.BLOG}?tagIds=${tag.id}`}
+            href={`${PATHNAME.BLOG}?tag=${tag.slug}`}
             className="h-fit shrink-0 truncate rounded-3xs bg-gray-1 px-1 py-0.5 text-2xs text-gray-200 shadow-sm transition-all hover:bg-gray-5 hover:text-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 dark:hover:text-white"
           >
             {tag.title}

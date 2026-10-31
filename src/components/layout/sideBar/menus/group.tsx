@@ -8,8 +8,8 @@ import { HTMLAttributes } from "react";
 interface GroupProps {
   title: string;
   amount: number;
-  groupId: string | number;
-  currentGroupId?: number;
+  groupSlug: string;
+  currentGroupSlug?: string;
   type: "Life" | "Dev";
 }
 
@@ -28,8 +28,8 @@ const Badge = ({ value }: BadgeProps) => {
 const Group = ({
   title,
   amount,
-  groupId,
-  currentGroupId,
+  groupSlug,
+  currentGroupSlug,
   type,
 }: GroupProps) => {
   const { updateQuery } = useQueryParams();
@@ -37,12 +37,12 @@ const Group = ({
   return (
     <Link
       href={updateQuery(
-        { groupId: `${groupId}` },
+        { group: groupSlug },
         {
           type: type === "Life" ? "dev" : "life",
-          categoryId: null,
+          category: null,
           pageIndex: null,
-          tagIds: null,
+          tag: null,
         },
       )}
       prefetch={false}
@@ -53,7 +53,7 @@ const Group = ({
       <span
         className={cn(
           "truncate text-gray-200 transition-all duration-200 hover:underline dark:text-gray-50",
-          groupId === currentGroupId && "font-bold underline",
+          groupSlug === currentGroupSlug && "font-bold underline",
         )}
       >
         {title}

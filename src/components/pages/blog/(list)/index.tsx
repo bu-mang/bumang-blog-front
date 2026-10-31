@@ -19,10 +19,10 @@ import { useSearchParams } from "next/navigation";
 interface BlogListViewProps {
   allPosts: null | PaginatedResponseDto<PostListItemType>;
   itemViewType: "list" | "thumbnail";
-  groupId?: number;
-  categoryId?: number;
+  group?: string;
+  category?: string;
   postType?: string;
-  tagIds?: string | string[];
+  tag?: string | string[];
 
   pageIndex: number;
   pageSize: number;
@@ -31,10 +31,10 @@ interface BlogListViewProps {
 export default function BlogInner({
   allPosts,
   itemViewType,
-  groupId,
-  categoryId,
+  group,
+  category,
   postType,
-  tagIds,
+  tag,
 
   pageIndex,
   pageSize,
@@ -66,10 +66,10 @@ export default function BlogInner({
     <BlogListView
       allPosts={allPosts}
       itemViewType={itemViewType}
-      groupId={groupId}
-      categoryId={categoryId}
+      group={group}
+      category={category}
       postType={postType}
-      tagIds={tagIds}
+      tag={tag}
       pageIndex={pageIndex}
       pageSize={pageSize}
     />
@@ -80,7 +80,7 @@ function BlogListView({
   allPosts,
   itemViewType,
   postType,
-  tagIds,
+  tag,
 }: BlogListViewProps) {
   const t = useTranslations("blog");
 
@@ -92,7 +92,7 @@ function BlogListView({
     <div className="col-span-full h-fit md:col-span-3">
       {/*  */}
       <LabelWithUtil
-        isTag={typeof tagIds !== "undefined"}
+        isTag={typeof tag !== "undefined"}
         title={
           allPosts?.subject ||
           postType ||
@@ -128,8 +128,8 @@ function BlogListView({
                 readPermisson,
                 score,
                 view,
-                categoryId,
-                groupId,
+                categorySlug,
+                groupSlug,
               },
               index,
             ) => (
@@ -144,8 +144,8 @@ function BlogListView({
                 // category & group
                 groupLabel={groupLabel}
                 categoryLabel={categoryLabel}
-                groupId={groupId}
-                categoryId={categoryId}
+                groupSlug={groupSlug}
+                categorySlug={categorySlug}
                 tags={tags}
                 date={createdAt}
                 thumbnailUrl={thumbnailUrl}

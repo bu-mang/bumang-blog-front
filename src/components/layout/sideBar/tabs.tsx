@@ -70,33 +70,21 @@ const Tabs = () => {
         {/* TABS */}
         <div className="flex h-full w-full gap-4">
           <Link
-            href={updateQuery({ type: "all" }, [
-              "categoryId",
-              "groupId",
-              "tagIds",
-            ])}
+            href={updateQuery({ type: "all" }, ["category", "group", "tag"])}
             className={getTabStyle("all")}
             ref={allRef}
           >
             All
           </Link>
           <Link
-            href={updateQuery({ type: "dev" }, [
-              "categoryId",
-              "groupId",
-              "tagIds",
-            ])}
+            href={updateQuery({ type: "dev" }, ["category", "group", "tag"])}
             className={getTabStyle("dev")}
             ref={devRef}
           >
             Dev
           </Link>
           <Link
-            href={updateQuery({ type: "life" }, [
-              "categoryId",
-              "groupId",
-              "tagIds",
-            ])}
+            href={updateQuery({ type: "life" }, ["category", "group", "tag"])}
             className={getTabStyle("life")}
             ref={lifeRef}
           >

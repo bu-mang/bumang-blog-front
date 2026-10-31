@@ -5,6 +5,7 @@ import Group from "./group";
 import Category from "./category";
 import { useSearchParams } from "next/navigation";
 import { LucideAlertCircle } from "lucide-react";
+import { isLifeGroup } from "@/constants/taxonomy";
 
 interface MenusProps {
   menus: GroupType[] | null;
@@ -16,22 +17,20 @@ const Menus = ({ menus }: MenusProps) => {
   const typeParam = searchParams.get("type")
     ? searchParams.get("type")
     : undefined;
-  const currentGroupId = searchParams.get("groupId")
-    ? Number(searchParams.get("groupId"))
-    : undefined;
-  const currentCategoryId = searchParams.get("categoryId")
-    ? Number(searchParams.get("categoryId"))
-    : undefined;
+  const currentGroupSlug = searchParams.get("group") ?? undefined;
+  const currentCategorySlug = searchParams.get("category") ?? undefined;
 
   return (
     <div className="flex w-full flex-col gap-4">
       {menus && menus.length > 0 ? (
         menus.map((group) => {
-          if (typeParam === "dev" && group.label === "Life") {
+          const isLife = isLifeGroup(group.slug);
+
+          if (typeParam === "dev" && isLife) {
             return null;
           }
 
-          if (typeParam === "life" && group.label !== "Life") {
+          if (typeParam === "life" && !isLife) {
             return null;
           }
 
@@ -41,9 +40,9 @@ const Menus = ({ menus }: MenusProps) => {
               <Group
                 title={group.label}
                 amount={group.totalPostsCount}
-                groupId={group.id}
-                currentGroupId={currentGroupId}
-                type={group.label === "Life" ? "Life" : "Dev"}
+                groupSlug={group.slug}
+                currentGroupSlug={currentGroupSlug}
+                type={isLife ? "Life" : "Dev"}
               />
 
               {/* CATEGORIES */}
@@ -51,10 +50,10 @@ const Menus = ({ menus }: MenusProps) => {
                 return (
                   <Category
                     key={category.id}
-                    categoryId={category.id}
+                    categorySlug={category.slug}
                     title={category.label}
-                    currentCategoryId={currentCategoryId}
-                    type={group.label === "Life" ? "Life" : "Dev"}
+                    currentCategorySlug={currentCategorySlug}
+                    type={isLife ? "Life" : "Dev"}
                   />
                 );
               })}

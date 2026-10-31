@@ -17,12 +17,16 @@ export type CategoryWithDate = DateType & CategoryNode;
 export interface CategoryType {
   id: number;
   label: string;
+  /** 주소용 고정 키 (예: "architecture"). 화면 이름(label)과 달리 바뀌지 않는다 */
+  slug: string;
   order: string;
 }
 
 export interface GroupType {
   id: number;
   label: string;
+  /** 주소·판정용 고정 키 (예: "life"면 Life 탭). 화면 이름(label)과 달리 바뀌지 않는다 */
+  slug: string;
   categories: CategoryType[];
 
   totalPostsCount: number;

@@ -12,10 +12,13 @@
 export interface TagType {
   id: number;
   title: string;
+  /** 주소용 고정 키 (예: "kubernetes") */
+  slug: string;
   group: {
     id: number;
     label: string;
+    slug: string;
   };
 }
 
-export type TagCompactType = Pick<TagType, "title" | "id">;
+export type TagCompactType = Pick<TagType, "title" | "id" | "slug">;

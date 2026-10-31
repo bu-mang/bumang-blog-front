@@ -144,8 +144,8 @@ function RelatedAndAdjacentPostInner({ id }: RelatedPostInnerProps) {
                 thumbnailUrl,
                 readPermisson,
                 view,
-                categoryId,
-                groupId,
+                categorySlug,
+                groupSlug,
               },
               index,
             ) => {
@@ -161,8 +161,8 @@ function RelatedAndAdjacentPostInner({ id }: RelatedPostInnerProps) {
                     // category & group
                     groupLabel={groupLabel}
                     categoryLabel={categoryLabel}
-                    groupId={groupId}
-                    categoryId={categoryId}
+                    groupSlug={groupSlug}
+                    categorySlug={categorySlug}
                     tags={tags}
                     date={createdAt}
                     thumbnailUrl={thumbnailUrl}

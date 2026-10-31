@@ -269,7 +269,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
             alt="Thumnail"
             src={
               post?.thumbnailUrl ||
-              getThumbnailByGroup(post.group.label, "postBanner")
+              getThumbnailByGroup(post.group?.slug, "postBanner")
             }
             className="bg-secondary object-cover object-top"
             priority
@@ -301,7 +301,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
             <FolderIcon size={18} className="group-hover:text-gray-600" />
             {post.group.label && (
               <Link
-                href={PATHNAME.BLOG + `?groupId=${post.group.id}`}
+                href={PATHNAME.BLOG + `?group=${post.group.slug}`}
                 className="group-hover:text-gray-600"
               >
                 {post.group.label}
@@ -314,7 +314,7 @@ export default function BlogDetailInnerView({ post }: BlogDetailInnerProps) {
           <div className="group flex cursor-pointer items-center justify-center gap-2 text-sm text-gray-300 transition-all hover:scale-105">
             <AlignJustifyIcon size={18} className="group-hover:text-gray-600" />
             <Link
-              href={PATHNAME.BLOG + `?categoryId=${post.category.id}`}
+              href={PATHNAME.BLOG + `?category=${post.category.slug}`}
               className="group-hover:text-gray-600"
             >
               {post.category.label ?? "No Category"}

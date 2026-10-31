@@ -22,13 +22,16 @@ export interface PostDetailResponseDto {
   category: {
     id: number;
     label: string;
+    slug: string;
   };
   group: {
     id: number;
     label: string;
+    slug: string;
   };
   tags: {
     id: number;
     label: string;
+    slug: string;
   }[];
 }
