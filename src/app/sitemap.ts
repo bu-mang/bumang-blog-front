@@ -8,7 +8,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://bumang.xyz";
 
   // 모든 블로그 포스트 가져오기 (페이지 크기를 크게 설정)
-  const postsData = await getAllPosts(0, 1000);
+  // pageIndex는 1부터 시작한다. 0을 보내면 백엔드가 skip((0-1)*1000) = OFFSET -1000을 만들어
+  // SQL 오류 → /sitemap.xml 500이 난다 (2026-11-19).
+  const postsData = await getAllPosts(1, 1000);
 
   // 블로그 포스트 URL 생성
   const koreanPostUrls = postsData.data.map((post) => ({
