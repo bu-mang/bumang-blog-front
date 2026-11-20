@@ -2,6 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 import { END_POINTS } from "./services";
+import { LEGACY_BLOG_LIST_QUERY_KEYS } from "./constants/taxonomy";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -11,6 +12,8 @@ const intlMiddleware = createMiddleware(routing);
 //   API를 직접 두드리는 요청은 막지 못했다.
 // - 봇 차단: Cloudflare WAF 규칙(엣지)이 맡는다. 예전엔 여기서 User-Agent 목록으로
 //   막았는데, 요청이 Node까지 온 뒤에야 걸러졌고 api 도메인은 덮지 못했다.
+//   (예외 하나: 목록 쿼리 함정 주소는 아래 middleware() 첫머리에서 끊는다 — UA가 아니라
+//   주소 모양으로 판정하므로 브라우저 UA를 흉내 내는 봇도 걸린다.)
 
 const AUTH_COOKIES = ["accessToken", "refreshToken"] as const;
 
@@ -91,6 +94,29 @@ async function requestTokenRefresh(
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // ------------------ 목록 쿼리 함정 차단 ------------------
+  // 2026-11-20 봇이 예전 필터 주소(?tagIds= 등)를 조합한 목록 주소를 30분에 약 4만 9천 번
+  // 긁어 프론트가 멈췄다. 이 주소들은 목록 페이지가 어차피 무시하고 전체 목록을 그리므로,
+  // 렌더링·백엔드 조회까지 가기 전에 여기서 끊는다. 엣지(Cloudflare WAF)에서 먼저 막는 게
+  // 정석이고, 이건 규칙이 빠지거나 우회됐을 때의 뒷받침이다.
+  if (/^\/(?:(?:ko|en)\/)?blog\/?$/.test(pathname)) {
+    const keys = Array.from(request.nextUrl.searchParams.keys());
+
+    // HTML 원문의 `&amp;`를 풀지 않고 그대로 붙인 주소는 키가 "amp;…"가 된다.
+    // 실제 브라우저는 이렇게 보내지 않는다 → 410(영구 삭제)으로 끝낸다.
+    if (keys.some((key) => key.startsWith("amp;"))) {
+      return new NextResponse(null, { status: 410 });
+    }
+
+    // 분류 개편 전 키가 섞인 주소는 옛 북마크일 수 있어, 그 키만 뺀 주소로 보낸다.
+    const legacyKeys: readonly string[] = LEGACY_BLOG_LIST_QUERY_KEYS;
+    if (keys.some((key) => legacyKeys.includes(key))) {
+      const url = request.nextUrl.clone();
+      for (const key of legacyKeys) url.searchParams.delete(key);
+      return NextResponse.redirect(url, 301);
+    }
+  }
 
   // 정적 리소스는 인증 처리를 건너뛴다
   const staticExtensions = [

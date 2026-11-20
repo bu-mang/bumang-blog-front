@@ -4,19 +4,29 @@ import { PaginatedResponseDto, PostListItemType } from "@/types";
 import { Metadata } from "next";
 import { capTagFilters } from "@/constants/taxonomy";
 
-export const metadata: Metadata = {
-  alternates: {
-    languages: {
-      'x-default': 'https://bumang.xyz/ko/blog',
-      ko: 'https://bumang.xyz/ko/blog',
-      en: 'https://bumang.xyz/en/blog',
-    },
-  },
-};
-
 interface PageProps {
   params: { category: string };
   searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  // 쿼리가 붙은 목록(필터·보기·페이지)은 검색 결과에 올리지 않고 링크도 따라가지 않게 한다.
+  // 조합이 끝없이 늘어나는 주소라 크롤러 함정이 된다 — BLOG_LIST_QUERY_KEYS 주석(2026-11-20).
+  // 글은 sitemap.xml로 찾게 한다. robots.ts도 같은 주소를 막는다.
+  const hasQuery = Object.keys(searchParams).length > 0;
+
+  return {
+    alternates: {
+      languages: {
+        "x-default": "https://bumang.xyz/ko/blog",
+        ko: "https://bumang.xyz/ko/blog",
+        en: "https://bumang.xyz/en/blog",
+      },
+    },
+    ...(hasQuery && { robots: { index: false, follow: false } }),
+  };
 }
 
 export default async function Blog({ searchParams }: PageProps) {
