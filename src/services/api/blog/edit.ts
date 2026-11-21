@@ -40,7 +40,6 @@ export const postCreatePreSignedUrl = async (
   filename: string,
   mimetype: string,
 ) => {
-  console.log(filename, mimetype, "fileName, mimetype");
   const res = await ClientInstance.post<CreatePreSignedUrlResponseDto>(
     END_POINTS.POST_IMAGE_PRESIGNED_URL,
     {
@@ -48,8 +47,6 @@ export const postCreatePreSignedUrl = async (
       mimetype,
     },
   );
-
-  console.log(res.data, "res.data postCreatePreSignedUrl");
 
   return res.data;
 };

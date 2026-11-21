@@ -84,10 +84,6 @@ function BlogListView({
 }: BlogListViewProps) {
   const t = useTranslations("blog");
 
-  // 서버 응답값 확인
-  console.log("📦 allPosts 서버 응답:", allPosts);
-  console.log("📝 allPosts.data:", allPosts?.data);
-
   return (
     <div className="col-span-full h-fit md:col-span-3">
       {/*  */}

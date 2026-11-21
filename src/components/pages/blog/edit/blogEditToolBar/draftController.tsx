@@ -270,7 +270,6 @@ const DraftController = ({ className }: DraftControllerProps) => {
                   key={draft.id}
                   value={`${draft.id}`}
                   onSelect={(currentValue) => {
-                    console.log(currentValue);
                     loadDraft(Number(currentValue));
                   }}
                 >

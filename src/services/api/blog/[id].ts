@@ -34,7 +34,5 @@ export const getAdjacentPosts = async (id: number) => {
     next: PostListItemType | null;
   }>(END_POINTS.GET_ADJACENT_POSTS(id));
 
-  console.log(res, "res");
-
   return res.data;
 };

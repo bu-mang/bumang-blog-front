@@ -334,16 +334,12 @@ export function PublishDrawer() {
     const imageUrls: string[] = [];
     const blocks = editor.document;
 
-    console.log("🔍 All blocks:", blocks);
-
     blocks.forEach((block) => {
-      console.log("📦 Block type:", block.type, "Props:", block.props);
       if (block.type === "image" && block.props?.url) {
         imageUrls.push(block.props.url as string);
       }
     });
 
-    console.log("🖼️ Found images:", imageUrls);
     return imageUrls;
   }, [editor]);
 

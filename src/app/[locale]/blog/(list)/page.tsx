@@ -61,7 +61,12 @@ export default async function Blog({ searchParams }: PageProps) {
       type: postType,
     });
   } catch (err) {
-    console.log(allPosts, err, "allPost error ");
+    // 데이터는 찍지 않는다 — 예전엔 응답·에러 객체를 통째로 찍어 로그가 불어났다.
+    const status = (err as { status?: number })?.status;
+    console.error(
+      `[blog list] 글 목록 조회 실패${status ? ` (HTTP ${status})` : ""}:`,
+      err instanceof Error ? err.message : err,
+    );
   }
 
   return (

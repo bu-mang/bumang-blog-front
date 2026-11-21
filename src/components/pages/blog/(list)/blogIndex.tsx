@@ -42,8 +42,6 @@ const BlogIndex = ({ onStart = true }: BlogIndexProps) => {
         })
         .filter((item) => item.id); // id가 있는 것만 필터링
 
-      console.log("📚 Parsed headings:", headingElements);
-
       // headings가 없으면 조금 후에 다시 시도
       if (headingElements.length === 0) {
         return false;
@@ -55,7 +53,6 @@ const BlogIndex = ({ onStart = true }: BlogIndexProps) => {
           const visibleEntry = entries.find((entry) => entry.isIntersecting);
           if (visibleEntry) {
             const id = visibleEntry.target.getAttribute("data-id");
-            console.log("👁️ Intersection detected, setting activeId:", id);
             if (id) setActiveId(id);
           }
         },
@@ -65,7 +62,6 @@ const BlogIndex = ({ onStart = true }: BlogIndexProps) => {
       headingElements.forEach(({ id }) => {
         const element = document.querySelector(`[data-id="${id}"]`);
         if (element) {
-          console.log("👀 Observing element:", id, element);
           observer.current?.observe(element);
         }
       });
@@ -92,18 +88,13 @@ const BlogIndex = ({ onStart = true }: BlogIndexProps) => {
 
   // activeId가 변경되면 해당 항목을 스크롤하여 보이게 함
   useEffect(() => {
-    console.log("🔍 Auto-scroll effect triggered, activeId:", activeId);
-
     if (!activeId || !containerRef.current) {
-      console.log("❌ Early return - activeId or containerRef missing");
       return;
     }
 
     const activeElement = containerRef.current.querySelector(
       `[data-heading-id="${activeId}"]`,
     ) as HTMLElement;
-
-    console.log("🎯 Active element found:", activeElement);
 
     if (activeElement) {
       const container = containerRef.current;
@@ -124,8 +115,6 @@ const BlogIndex = ({ onStart = true }: BlogIndexProps) => {
         top: targetScroll,
         behavior: "smooth",
       });
-
-      console.log("✅ scrollTo called with:", targetScroll);
     }
   }, [activeId]);
 
