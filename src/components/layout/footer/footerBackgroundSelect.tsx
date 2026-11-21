@@ -9,7 +9,8 @@ import { ButtonBase } from "@/components/common";
 
 interface FooterBackgroundSelectProps {
   target: BackgroundItem;
-  onChangeIndicator: (v: number) => void;
+  /** 마우스를 올린 점의 번호. 내리면 null(지금 배경 이름으로 돌아감). */
+  onChangeIndicator: (v: number | null) => void;
 }
 
 export default function FooterBackgroundSelect({
@@ -28,7 +29,7 @@ export default function FooterBackgroundSelect({
         target[0] === selectedIndex && "border border-white bg-black",
       )}
       onMouseEnter={() => onChangeIndicator(target[0])}
-      onMouseLeave={() => onChangeIndicator(selectedIndex)}
+      onMouseLeave={() => onChangeIndicator(null)}
       onClick={() => setSelectedItem(target[0])}
     />
   );

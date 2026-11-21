@@ -23,7 +23,16 @@ export default function InteractiveBackground() {
   const homeSelectedIndex = useBackgroundStore(
     (state) => state.home.selectedIndex,
   );
+  const pickRandomHomeItem = useBackgroundStore(
+    (state) => state.home.pickRandomItem,
+  );
   const bgColor = useBackgroundStore((state) => state.backgroundColor);
+
+  // 홈 배경은 페이지를 새로 열 때마다 비율대로 뽑는다(백합 70% / 그림 30%).
+  // 사이트 안에서 이동해 홈으로 돌아올 땐 다시 뽑지 않는다(스토어가 유지된다).
+  useEffect(() => {
+    pickRandomHomeItem();
+  }, [pickRandomHomeItem]);
 
   // 페이지 귀속 배경
   const renderInteractiveBackground = () => {
@@ -32,9 +41,11 @@ export default function InteractiveBackground() {
       case PATHNAME.WORK:
         return <WorkBackground />;
       case PATHNAME.HOME:
-        return process.env.NODE_ENV === "production"
-          ? HomeBackgrounds[homeSelectedIndex]
-          : HomeBackgrounds[0]; // 개발 중인 백그라운드
+        if (process.env.NODE_ENV !== "production") return HomeBackgrounds[0]; // 개발 중인 백그라운드
+        // 뽑기 전(서버 렌더링·첫 프레임)엔 기본 배경을 보여 준다.
+        return homeSelectedIndex === null
+          ? null
+          : HomeBackgrounds[homeSelectedIndex];
 
       default:
         return null;

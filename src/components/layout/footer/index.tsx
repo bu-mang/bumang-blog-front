@@ -30,11 +30,10 @@ const Footer = () => {
   const list = useBackgroundStore((state) => state.home.list);
   const selectedIndex = useBackgroundStore((state) => state.home.selectedIndex);
 
-  const [indicator, setIndicator] = useState(list[selectedIndex]);
-
-  const handleIndicator = (selected: number) => {
-    setIndicator(list[selected]);
-  };
+  // 점에 마우스를 올리면 그 배경 이름, 아니면 지금 배경 이름. 배경을 뽑기 전엔 비워 둔다.
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const shownIndex = hoveredIndex ?? selectedIndex;
+  const indicatorName = shownIndex === null ? "" : list[shownIndex][1];
 
   return (
     <div className={footerClass}>
@@ -45,12 +44,12 @@ const Footer = () => {
               <FooterBackgroundSelect
                 key={item[0]}
                 target={item}
-                onChangeIndicator={handleIndicator}
+                onChangeIndicator={setHoveredIndex}
               />
             ))}
           </div>
 
-          <div className="text-gray-200">{indicator[1]}</div>
+          <div className="text-gray-200">{indicatorName}</div>
         </div>
 
         <div>
