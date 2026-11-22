@@ -366,7 +366,7 @@ export default function AboutInner({
       <SectionBox className={cn("fade-in-mount px-[2vw] md:px-[6vw]")}>
         <div className="top-20 col-span-full mb-3 flex flex-col text-6xl font-semibold tbl:sticky tbl:col-span-3 tbl:mb-20 tbl:h-32">
           <span>Basic</span>
-          <span>Level in</span>
+          <span>Level</span>
         </div>
 
         <div className="col-span-full tbl:col-start-4 tbl:col-end-9 tbl:-translate-y-3">

@@ -5,7 +5,7 @@
         "1": "Bumang!",
         "2": "Who loves Interactives"
       },
-      "desc": "I majored in Industrial design and worked as a UX designer before transitioning to frontend development. I have a passion for art and enjoy drawing as a hobby. I'm particularly interested in creating interactive 2D/3D content on the web, exploring WebGL and Canvas. My goal is to become a full-stack developer, and I enjoy working on solo development projects and experimenting with new technologies. I'm always open to exciting side project ideas!"
+      "desc": "Hi, I'm Bumang, a product engineer. I studied industrial design in college and started my career as a UX designer. At the first company I joined as a frontend developer, I took on backend work too and ended up working across the full stack. I'm still not quite sure how I ended up taking such a winding career path. One thing I do know is that I have a nerdy streak. I love losing myself in something for hours, feel right at home doing it, and usually end up getting pretty good at it. My dream is to make a living as a solo developer."
     },
     "record": {
       "2026": {
@@ -146,8 +146,8 @@
       },
       "basicLevel": {
         "1": {
-          "title": "SCSS",
-          "desc": "CSS Styling"
+          "title": "C/C++",
+          "desc": "Low-level languages"
         },
         "2": {
           "title": "Redux-Tookit, Jotai",
