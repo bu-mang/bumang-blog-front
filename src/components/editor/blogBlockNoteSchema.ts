@@ -18,17 +18,13 @@ import { maskedStyleSpec } from "./maskedStyle";
  */
 export const blogBlockNoteSchema = BlockNoteSchema.create().extend({
   blockSpecs: {
+    // 언어 목록은 패키지 기본값(48개, "text" 포함)을 그대로 쓴다. 문법 파일은 언어마다
+    // 따로 쪼개진 chunk라 그 언어 블록이 화면에 있을 때만 받는다 — 목록을 늘려도 초기 번들은 그대로.
+    // 기존 글의 키(typescript·javascript·python·java·markdown·sql)는 모두 기본값에 있다.
+    // 언어를 빼는 건 위험하다: 그 키로 저장된 옛 글의 하이라이팅이 깨진다.
     codeBlock: createCodeBlockSpec({
       ...codeBlockOptions,
       defaultLanguage: "typescript",
-      supportedLanguages: {
-        typescript: { name: "TypeScript", aliases: ["ts"] },
-        javascript: { name: "JavaScript", aliases: ["js"] },
-        python: { name: "Python", aliases: ["py"] },
-        java: { name: "Java", aliases: [] },
-        markdown: { name: "Markdown", aliases: ["md"] },
-        sql: { name: "SQL", aliases: [] },
-      },
     }),
   },
   // 인라인 마스킹 스타일. audience 그룹 기준으로 문장 중간 구간을 가린다.
